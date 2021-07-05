@@ -1,14 +1,41 @@
 import  express  from 'express';
-import { pool } from '../db/db.js';
-import { loginMoodle } from '../puppeteer/puppeteer.js';
+import { courseExplorerListQuery } from '../puppeteer/puppeteer.js';
+import { GET_ASYNC, SET_ASYNC } from '../../index.js';
 const router = express.Router();
 
-// get a list of courses the user has.
-router.get('/courses', async function(req, res, next) {
-    res.send({type: 'GET'});
+// get a list of courses based on a query.
+
+router.get('/courses/search', async function(req, res, next) {
+    try {
+        const query = req.query.query.toLowerCase();
+        let cacheData = await GET_ASYNC(query.trim());
+        
+        if (cacheData !== undefined && cacheData !== null) {
+            res.send({
+                status: "success",
+                data: JSON.parse(cacheData)
+            });
+            return;
+        }
+
+        let cachedJson = await courseExplorerListQuery(query).catch(next);
+        let parsedJson = JSON.parse(cachedJson);
+        await SET_ASYNC(query.trim(), 86400, cachedJson);
+        res.send({
+            status: "success",
+            data: parsedJson
+        });
+    } catch (e) {
+        console.log(e);
+        res.status(422).send({
+            status: "failed",
+            error: e.message,
+        })
+    }
 });
 
-// new user logging in, add to db.
+// SCRAPPED
+/* // new user logging in, add to db.
 router.post('/login', async function(req, res, next) {
     const {netid, password} = req.body;
     let cookies = await loginMoodle(netid, password);
@@ -56,6 +83,6 @@ router.delete('/logout', async function(req, res, next) {
     const {netid} = req.body;
     const user = await pool.query("DELETE FROM users WHERE netid = $1", [netid]);
     res.send({type: 'DELETE'});
-});
+}); */
 
 export {router};

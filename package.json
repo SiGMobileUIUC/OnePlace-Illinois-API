@@ -1,11 +1,11 @@
 {
   "name": "oneplace-illinois-api",
-  "version": "1.0.0",
+  "version": "0.0.2",
   "description": "Automated webscraping api",
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "nodemon index"
   },
   "repository": {
     "type": "git",
@@ -18,7 +18,8 @@
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
     "pg": "^8.6.0",
-    "puppeteer": "^10.1.0"
+    "puppeteer": "^10.1.0",
+    "redis": "^3.1.2"
   },
   "devDependencies": {
     "nodemon": "^2.0.9"

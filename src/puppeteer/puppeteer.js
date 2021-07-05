@@ -1,6 +1,6 @@
 import puppeteer from "puppeteer";
-import CustomError from "puppeteer";
 const moodle = "https://learn.illinois.edu/login/other.php?saml=on&target=https%3A%2F%2Flearn.illinois.edu%2F";
+const courseExplorerSearch = "https://courses.illinois.edu/search/form";
 
 async function configureBrowser() {
     const browser = await puppeteer.launch({
@@ -9,7 +9,78 @@ async function configureBrowser() {
     return browser;
 }
 
-async function loginMoodle(username, password) {
+async function courseExplorerListQuery(query) {
+    const browser = await configureBrowser();
+    const page = await browser.newPage();
+    try {
+        await page.goto(courseExplorerSearch);
+    } catch (error) {
+        browser.close();
+        throw "There was an error running the request";
+    }
+    await page.waitForSelector('input[id="keyword"]')
+    await page.waitForSelector('button[class="btn btn-sm btn-primary"]')
+    await page.type('input[id="keyword"]', query);
+    await page.click('button[class="btn btn-sm btn-primary"]');
+    await page.waitForSelector('tr[role="row"]');
+    try {
+        let cachedJson = await page.evaluate(() => {
+            debugger;
+            let rows = Array.from(document.querySelectorAll('tr[role="row"]'));
+            let years = [];
+            let terms = [];
+            let subjects = [];
+            let numbers = [];
+            let names = [];
+            rows.forEach((item, index) => {
+                if (index === 0) {
+                    return;
+                }
+                years.push(item.children[1].innerText);
+                terms.push(item.children[2].innerText);
+                let split = item.children[3].innerText.split(" ");
+                subjects.push(split[0]);
+                numbers.push(split[0]);
+                names.push(item.children[4].innerText);
+            });
+            let coursesList = [];
+            years.forEach((item, index) => {
+                let json = `
+                {
+                    "year" : ${item},
+                    "term" : "${terms[index]}",
+                    "subjectID" : "${subjects[index]}",
+                    "subjectNumber" : "${numbers[index]}",
+                    "name" : "${names[index]}"
+                }
+                `
+                coursesList.push(json);
+            });
+            let jsonCourses = `
+            {
+                "courses" : [${coursesList}]
+            }`;
+            return jsonCourses;
+        });
+        browser.close();
+        return cachedJson;
+    } catch (error) {
+        console.log(error);
+        browser.close();
+        throw "There was an error running the request.";
+    }
+}
+
+export {courseExplorerListQuery};
+
+
+
+
+
+
+
+// SCRAPPED
+/* async function loginMoodle(username, password) {
     const browser = await configureBrowser();
     const shibboleth = await browser.newPage();
     await shibboleth.goto(moodle, {waitUntil: 'networkidle2'});
@@ -54,6 +125,4 @@ async function loginMoodle(username, password) {
     await browser.close();
     return cookies;
 
-}
-
-export {loginMoodle};
+} */
