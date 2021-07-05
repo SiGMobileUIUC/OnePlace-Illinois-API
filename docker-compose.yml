@@ -1,0 +1,17 @@
+version: "3.9"
+services:
+  redis:
+    image: redis
+    networks:
+        - webnet
+  web:
+    image: sigmobile/oneplace_api
+    ports:
+      - "80:80"
+    networks:
+      - webnet
+    environment:
+      PORT: 80
+      REDIS_HOST: redis
+networks:
+  webnet:

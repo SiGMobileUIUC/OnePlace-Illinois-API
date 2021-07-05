@@ -5,7 +5,7 @@ import { createClient} from 'redis';
 import { promisify } from 'util';
 import helmet from 'helmet';
 
-const client = createClient(6379);
+const client = createClient(6379, process.env.REDIS_HOST || '127.0.0.1');
 const GET_ASYNC = promisify(client.get).bind(client);
 const SET_ASYNC = promisify(client.setex).bind(client);
 

@@ -5,6 +5,8 @@ const courseExplorerSearch = "https://courses.illinois.edu/search/form";
 async function configureBrowser() {
     const browser = await puppeteer.launch({
         headless: true,
+        executablePath: "/usr/bin/chromium",
+        args: ['--no-sandbox']
     });
     return browser;
 }
@@ -12,6 +14,7 @@ async function configureBrowser() {
 async function courseExplorerListQuery(query) {
     const browser = await configureBrowser();
     const page = await browser.newPage();
+    await page.setViewport({ width: 1920, height: 1080 });
     try {
         await page.goto(courseExplorerSearch);
     } catch (error) {
@@ -21,8 +24,16 @@ async function courseExplorerListQuery(query) {
     await page.waitForSelector('input[id="keyword"]')
     await page.waitForSelector('button[class="btn btn-sm btn-primary"]')
     await page.type('input[id="keyword"]', query);
+    console.log(query);
     await page.click('button[class="btn btn-sm btn-primary"]');
-    await page.waitForSelector('tr[role="row"]');
+    try {
+        await page.waitForSelector('tr[role="row"]');   
+    } catch (error) {
+        console.log(error);
+        browser.close();
+        throw "The passed query did not work";
+    }
+    console.log("trying to find row");
     try {
         let cachedJson = await page.evaluate(() => {
             debugger;

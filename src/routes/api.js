@@ -11,16 +11,19 @@ router.get('/courses/search', async function(req, res, next) {
         let cacheData = await GET_ASYNC(query.trim());
         
         if (cacheData !== undefined && cacheData !== null) {
+            console.log("cached data found");
             res.send({
                 status: "success",
                 data: JSON.parse(cacheData)
             });
             return;
         }
-
-        let cachedJson = await courseExplorerListQuery(query).catch(next);
+        console.log("searching through puppeteer");
+        let cachedJson = await courseExplorerListQuery(query);
+        console.log("got json");
         let parsedJson = JSON.parse(cachedJson);
         await SET_ASYNC(query.trim(), 86400, cachedJson);
+        console.log("cached json saved");
         res.send({
             status: "success",
             data: parsedJson
