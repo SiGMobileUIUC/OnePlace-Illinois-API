@@ -3,14 +3,16 @@ import { router } from './src/routes/api.js';
 import bodyParser from 'body-parser';
 import { createClient} from 'redis';
 import { promisify } from 'util';
+import helmet from 'helmet';
 
-const REDIS_PORT = process.env.PORT || 6379;
-const client = createClient(REDIS_PORT);
+const client = createClient(6379);
 const GET_ASYNC = promisify(client.get).bind(client);
 const SET_ASYNC = promisify(client.setex).bind(client);
 
 // set up express app
 const app = express();
+
+app.use(helmet());
 
 app.use(bodyParser.json());
 
