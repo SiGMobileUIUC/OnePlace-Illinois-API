@@ -51,7 +51,7 @@ async function courseExplorerListQuery(query) {
                 terms.push(item.children[2].innerText);
                 let split = item.children[3].innerText.split(" ");
                 subjects.push(split[0]);
-                numbers.push(split[0]);
+                numbers.push(split[1]);
                 names.push(item.children[4].innerText);
             });
             let coursesList = [];
