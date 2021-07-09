@@ -1,23 +1,15 @@
-FROM node:14
+FROM node:alpine
 
-WORKDIR /usr/src/app
+RUN mkdir -p /usr/src/node-app && chown -R node:node /usr/src/node-app
 
-COPY package*.json ./
+WORKDIR /usr/src/node-app
 
-RUN apt-get update
+COPY package.json yarn.lock ./
 
-RUN apt-get install -y chromium
+USER node
 
-RUN npm install
+RUN yarn install --pure-lockfile
 
-COPY . .
+COPY --chown=node:node . .
 
-RUN npm ci --only=production
-
-EXPOSE 80
-
-EXPOSE 6379
-
-ENV PORT=80
-
-CMD [ "npm", "start"]
+EXPOSE 3000

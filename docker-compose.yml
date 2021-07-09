@@ -1,17 +1,32 @@
-version: "3.9"
+version: '3'
+
 services:
-  redis:
-    image: redis
-    networks:
-        - webnet
-  web:
-    image: sigmobile/oneplace_api
-    ports:
-      - "80:80"
-    networks:
-      - webnet
+  node-app:
+    build: .
+    image: node-app
     environment:
-      PORT: 80
-      REDIS_HOST: redis
+      - MONGODB_URL=mongodb://mongodb:27017/node-boilerplate
+    ports:
+      - '3000:3000'
+    depends_on:
+      - mongodb
+    volumes:
+      - .:/usr/src/node-app
+    networks:
+      - node-network
+
+  mongodb:
+    image: mongo:4.2.1-bionic
+    ports:
+      - '27017:27017'
+    volumes:
+      - dbdata:/data/db
+    networks:
+      - node-network
+
+volumes:
+  dbdata:
+
 networks:
-  webnet:
+  node-network:
+    driver: bridge
