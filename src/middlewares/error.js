@@ -26,6 +26,7 @@ const errorHandler = (err, req, res, next) => {
   res.locals.errorMessage = err.message;
 
   const response = {
+    ...(config.env === 'development' && { DEV_NOTE: 'STACK is only shown in NODE_ENV=development' }),
     code: statusCode,
     message,
     ...(config.env === 'development' && { stack: err.stack }),

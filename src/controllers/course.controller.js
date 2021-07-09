@@ -5,12 +5,12 @@ const catchAsync = require('../utils/catchAsync');
 const { courseService } = require('../services');
 
 const search = catchAsync(async (req, res) => {
-  console.log(req.query)
   const options = pick(req.query, ['keyword', 'year', 'term']);
   const courses = await courseService.searchCourses(options);
 
   if (!courses) {
-    throw new ApiError(httpStatus.NOT_FOUND, e.message);
+    // throw new ApiError(httpStatus.NOT_FOUND, e.message);
+    throw new ApiError(httpStatus.NOT_FOUND, 'No matching course found');
   }
 
   res.send({ courses });
