@@ -1,23 +1,17 @@
-FROM node:14
+FROM node:alpine
 
-WORKDIR /usr/src/app
+RUN mkdir /usr/src/node-app
 
-COPY package*.json ./
+WORKDIR /usr/src/node-app
 
-RUN apt-get update
+COPY package.json ./
 
-RUN apt-get install -y chromium
-
-RUN npm install
+RUN npm install --only=production
 
 COPY . .
 
-RUN npm ci --only=production
+ENV PORT=80
 
 EXPOSE 80
-
-EXPOSE 6379
-
-ENV PORT=80
 
 CMD [ "npm", "start"]

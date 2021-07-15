@@ -1,17 +1,12 @@
-version: "3.9"
+version: '3'
+
 services:
-  redis:
-    image: redis
-    networks:
-        - webnet
-  web:
-    image: sigmobile/oneplace_api
+  node-app:
+    build: .
+    image: node-app
     ports:
-      - "80:80"
-    networks:
-      - webnet
-    environment:
-      PORT: 80
-      REDIS_HOST: redis
-networks:
-  webnet:
+      - '3000:3000'
+    volumes:
+      - .:/usr/src/node-app
+    command:
+      npm run start
