@@ -12,7 +12,7 @@ module.exports = {
     allowNull: false,
   },
   code: {
-    type: DataTypes.INTEGER(5).UNSIGNED,
+    type: DataTypes.INTEGER,
     allowNull: false,
   },
   full_code: {

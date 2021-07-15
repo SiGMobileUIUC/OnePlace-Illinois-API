@@ -1,4 +1,9 @@
+const axios = require('axios');
 const parser = require('fast-xml-parser');
+
+const { Subjects, Courses } = require('../models');
+
+const isArray = (a) => (!!a) && (a.constructor === Array);
 
 /**
  * Parses XML from response into JSON
@@ -69,6 +74,8 @@ const getCourses = async (year, term, subject) => {
     .get(`https://courses.illinois.edu/cisapp/explorer/schedule/${year}/${term}/${subject}.xml`)
     .then(parseResponseXMLWithAttributes)
     .then((data) => data['ns2:subject'].courses.course)
+    // some data contains only one course, which returns {} instead of [{}, {}, {}]
+    .then((data) => (isArray(data) ? data : [data]))
     .then((courses) => courses.reduce((obj, course) => ({ ...obj, [course['@_id']]: course['#text'] }), {}));
 };
 
@@ -85,6 +92,8 @@ const getSections = async (year, term, subject, course) => {
     .get(`https://courses.illinois.edu/cisapp/explorer/schedule/${year}/${term}/${subject}/${course}.xml`)
     .then(parseResponseXMLWithAttributes)
     .then((data) => data['ns2:course'].sections.section)
+    // some data contains only one section, which returns {} instead of [{}, {}, {}]
+    .then((data) => (isArray(data) ? data : [data]))
     .then((sections) => sections.reduce((obj, section) => ({ ...obj, [section['@_id']]: section['#text'] }), {}));
 };
 
@@ -113,8 +122,41 @@ const getMeetings = async (year, term, subject, course, section) => {
 };
 
 (async () => {
-  // const testFunc = 'meetings';
-  const testFunc = 'sections';
+  const year = 2021;
+  const term = 'fall';
+  const subjects = await getSubjects(year, term);
+  const subjectCodes = Object.keys(subjects);
+
+  // Add Subjects to DB
+  console.log(subjectCodes);
+  // for (const subjectCode of subjectCodes) {
+  //   await Subjects.create({ code: subjectCode, name: subjects[subjectCode] });
+  // }
+
+  // Fetch & Add Courses of Each Subject to DB
+  // eslint-disable-next-line no-restricted-syntax
+  for (const subjectCode of subjectCodes) {
+    const courses = await getCourses(year, term, subjectCode);
+    const courseCodes = Object.keys(courses);
+    for (const courseCode of courseCodes) {
+      const courseData = {
+        subject: subjectCode,
+        code: courseCode,
+        full_code: `${subjectCode}_${courseCode}`,
+        name: courses[courseCode],
+      };
+      await Courses.findOrCreate({
+        where: courseData,
+        // set the default properties if it doesn't exist
+        defaults: courseData,
+      });
+    }
+  }
+})();
+
+(async () => {
+  const testFunc = '';
+  // const testFunc = 'courses';
 
   let data;
   switch (testFunc) {
@@ -141,24 +183,4 @@ const getMeetings = async (year, term, subject, course, section) => {
   }
 
   console.log(data);
-
-  const coursesRef = db.collection('courses');
-
-  const subjectYear = 2021;
-  const subjectTerm = 'fall';
-  const subjectCode = 'CS';
-  const courseData = await getCourses(subjectYear, subjectTerm, subjectCode);
-  console.log(courseData);
-
-  for (const courseCode of Object.keys(courseData)) {
-    const courseName = courseData[courseCode];
-    const docName = `${subjectCode}_${courseCode}`;
-
-    await coursesRef.doc(docName).set({
-      name: courseName,
-      code: courseCode,
-      subject: subjectCode,
-    });
-  }
-
 })();
