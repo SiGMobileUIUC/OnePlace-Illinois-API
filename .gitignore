@@ -9,8 +9,8 @@ yarn-error.log
 !.env*.example
 
 # IDE
-.vscode
-.idea
+.vscode/
+.idea/
 
 # Code coverage
 coverage
