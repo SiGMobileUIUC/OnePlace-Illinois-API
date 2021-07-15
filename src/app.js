@@ -21,7 +21,7 @@ if (config.env !== 'test') {
   app.use(morgan.errorHandler);
 }
 
-db.sequelize.sync({ force: true }).then(() => {
+db.sequelize.sync({ force: false }).then(() => {
   console.log('Restarted db');
 });
 
