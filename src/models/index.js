@@ -16,4 +16,10 @@ Object.keys(models).forEach((modelName) => {
   models[modelName] = sequelize.define(modelName, models[modelName]);
 });
 
+/*
+    Define Table Relations
+ */
+// foreign key from Course.subject to Subjects.code
+models.Courses.belongsTo(models.Subjects, { foreignKey: 'subject', targetKey: 'code' });
+
 module.exports = { ...models, sequelize };

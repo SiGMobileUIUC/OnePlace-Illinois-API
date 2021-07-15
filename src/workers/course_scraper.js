@@ -129,9 +129,9 @@ const getMeetings = async (year, term, subject, course, section) => {
 
   // Add Subjects to DB
   console.log(subjectCodes);
-  // for (const subjectCode of subjectCodes) {
-  //   await Subjects.create({ code: subjectCode, name: subjects[subjectCode] });
-  // }
+  for (const subjectCode of subjectCodes) {
+    await Subjects.create({ code: subjectCode, name: subjects[subjectCode] });
+  }
 
   // Fetch & Add Courses of Each Subject to DB
   // eslint-disable-next-line no-restricted-syntax
