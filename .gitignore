@@ -8,8 +8,15 @@ yarn-error.log
 .env*
 !.env*.example
 
+# IDE
+.vscode
+.idea
+
 # Code coverage
 coverage
 
 # Server Firebase
 serviceAccountKey.json
+
+# misc
+.DS_Store

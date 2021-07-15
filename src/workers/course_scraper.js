@@ -114,7 +114,7 @@ const getMeetings = async (year, term, subject, course, section) => {
 
 (async () => {
   // const testFunc = 'meetings';
-  const testFunc = '';
+  const testFunc = 'sections';
 
   let data;
   switch (testFunc) {
