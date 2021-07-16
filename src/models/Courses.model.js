@@ -26,7 +26,7 @@ module.exports = {
     allowNull: false,
   },
   description: {
-    type: DataTypes.TEXT('tiny'),
-    allowNull: false,
+    type: DataTypes.TEXT, // Postgres doesn't support text with option (e.g. tinytext)
+    allowNull: true,
   },
 };

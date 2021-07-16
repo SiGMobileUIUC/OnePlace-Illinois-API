@@ -7,28 +7,47 @@ module.exports = {
     allowNull: false,
     unique: true,
   },
-  CRN: {
-    type: DataTypes.INT,
+  year: {
+    type: DataTypes.INTEGER,
     allowNull: false,
   },
-  code: {
+  term: {
     type: DataTypes.STRING,
     allowNull: false,
+  },
+  CRN: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+  },
+  full_code: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    primaryKey: true,
+    unique: true,
   },
   course: {
     type: DataTypes.STRING(20),
     allowNull: false,
   },
+  // optionals
+  code: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
   title: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true,
+  },
+  info: {
+    type: DataTypes.TEXT,
+    allowNull: true,
   },
   part_of_term: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.STRING,
     allowNull: true,
   },
   credit_hours: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.STRING,
     allowNull: true,
   },
   section_status: {
