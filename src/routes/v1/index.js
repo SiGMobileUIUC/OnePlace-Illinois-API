@@ -1,13 +1,19 @@
 const express = require('express');
-const coursesRoute = require('./course.route');
+
 const config = require('../../config/config');
+const courseRoute = require('./course.route');
+const sectionRoute = require('./section.route');
 
 const router = express.Router();
 
 const defaultRoutes = [
   {
     path: '/course',
-    route: coursesRoute,
+    route: courseRoute,
+  },
+  {
+    path: '/section',
+    route: sectionRoute,
   },
 ];
 

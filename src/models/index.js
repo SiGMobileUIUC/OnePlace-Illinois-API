@@ -13,6 +13,7 @@ const sequelize = new Sequelize(pgconf.dbname, pgconf.user, pgconf.password, {
   host: pgconf.host,
   dialect: pgconf.dialect,
   pool: pgconf.pool,
+  // logging: false,
 });
 
 Object.keys(models).forEach((modelName) => {

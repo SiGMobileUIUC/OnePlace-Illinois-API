@@ -8,9 +8,14 @@ const { Courses } = require('../models');
 
 const isUpperCase = (str) => str === str.toUpperCase();
 
+/**
+ * Search courses on local Postgres
+ * @param options
+ * @returns {Promise<*|*>}
+ */
 const searchCourses = async (options) => {
   try {
-    const { keyword, term, year } = options;
+    const { keyword } = options;
     const keywordArr = keyword.split(' ');
 
     /*
@@ -60,8 +65,8 @@ const searchCourses = async (options) => {
     ].filter((x) => x.length > 0);
 
     const dbOptions = {
-      attributes: ['subject', 'code', 'name', 'year', 'term'],
-      where: { term, year, [Op.or]: orQueries },
+      attributes: ['subject', 'code', 'name'],
+      where: { [Op.or]: orQueries },
       order: resultOrder,
     };
 
@@ -74,8 +79,6 @@ const searchCourses = async (options) => {
       subjectId: course.subject,
       subjectNumber: course.code,
       name: course.name,
-      year: course.year,
-      term: course.term,
     }));
 
     return courses;
@@ -132,7 +135,7 @@ const searchCoursesThroughWebsites = async (options) => {
   } catch (e) {
     throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Internal server error');
   }
-}
+};
 
 module.exports = {
   searchCourses,
