@@ -144,6 +144,8 @@ const getMeetings = async (year, term, subject, course, section) => {
         code: courseCode,
         full_code: `${subjectCode}_${courseCode}`,
         name: courses[courseCode],
+        year,
+        term,
       };
       await Courses.findOrCreate({
         where: courseData,

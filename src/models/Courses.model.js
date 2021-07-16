@@ -25,4 +25,12 @@ module.exports = {
     type: DataTypes.STRING,
     allowNull: false,
   },
+  year: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+  },
+  term: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
 };
