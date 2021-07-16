@@ -1,0 +1,5 @@
+# https://stackoverflow.com/a/37458519
+# min hour day month weekday command
+* * * * * root echo hello > /proc/1/fd/1 2>/proc/1/fd/2
+0 0 * * * node /usr/src/node-app/src/workers/course-scraper.js > /proc/1/fd/1 2>/proc/1/fd/2
+# Don't remove the empty line at the end of this file. It is required to run the cron job

@@ -8,10 +8,10 @@ const envVarsSchema = Joi.object()
     NODE_ENV: Joi.string().valid('production', 'development', 'test').required(),
     PORT: Joi.number().default(80),
 
-    POSTGRES_DB_HOST: Joi.string().required().default('localhost'),
-    POSTGRES_DB_USER: Joi.string().required().default('postgres'),
-    POSTGRES_DB_PASSWORD: Joi.string().required(),
-    POSTGRES_DB_NAME: Joi.string().required().description('Database name to connect'),
+    POSTGRES_HOST: Joi.string().required().default('localhost'),
+    POSTGRES_USER: Joi.string().required().default('postgres'),
+    POSTGRES_PASSWORD: Joi.string().required(),
+    POSTGRES_DB: Joi.string().required().description('Database name to connect'),
 
     JWT_SECRET: Joi.string().required().description('JWT secret key'),
     JWT_ACCESS_EXPIRATION_MINUTES: Joi.number().default(30).description('minutes after which access tokens expire'),
@@ -41,9 +41,9 @@ module.exports = {
   port: envVars.PORT,
 
   postgres: {
-    host: envVars.POSTGRES_DB_HOST,
-    user: envVars.POSTGRES_DB_USER,
-    password: envVars.POSTGRES_DB_PASSWORD,
+    host: envVars.POSTGRES_HOST,
+    user: envVars.POSTGRES_USER,
+    password: envVars.POSTGRES_PASSWORD,
     dbname: envVars.POSTGRES_DB,
     dialect: 'postgres',
     pool: {
