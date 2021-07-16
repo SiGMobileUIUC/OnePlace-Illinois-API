@@ -1,9 +1,9 @@
-const { Sequelize, DataTypes } = require('sequelize');
+const { DataTypes } = require('sequelize');
 
 module.exports = {
   _id: {
     type: DataTypes.UUID,
-    defaultValue: Sequelize.UUIDV4,
+    defaultValue: DataTypes.UUIDV4,
     allowNull: false,
     unique: true,
   },
@@ -25,12 +25,8 @@ module.exports = {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  year: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-  },
-  term: {
-    type: DataTypes.STRING,
+  description: {
+    type: DataTypes.TEXT('tiny'),
     allowNull: false,
   },
 };
