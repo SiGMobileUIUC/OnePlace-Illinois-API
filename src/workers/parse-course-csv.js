@@ -129,7 +129,7 @@ const readCSV = async (filePath) => {
       batch.sectionData = [];
       idx = 0;
 
-      // console.log('----------------------------------\n>>> Batch cleared! <<<\n----------------------------------');
+      console.log('>>> [Parse Course CSV] Batch cleared... Going to the next batch... be patient!');
     }
   }
 })();

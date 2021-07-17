@@ -1,12 +1,45 @@
 version: '3'
 
 services:
-  node-app:
+  app:
     build: .
-    image: node-app
+    image: opillinois-api-app
+    depends_on:
+      - postgres
+    links:
+      - postgres
+    volumes:
+      - .:/usr/src/oneplace-illinois-api
     ports:
       - '80:80'
+      - '3000:3000' # for alternative local dev
+    networks:
+      - default
+    env_file:
+      - .env.docker # postgres env data
+    environment:
+      # https://docs.docker.com/docker-for-mac/networking/#use-cases-and-workarounds
+      # POSTGRES_HOST -- host.docker.internal (Docker figures out host for us) and avoid using 127.0.0.1 (localhost)
+      POSTGRES_HOST: host.docker.internal
+      PORT: 3000
+    # Run multiple commands
+    # *** use 'sh' since alpine doesn't support 'bash' ***
+    command: sh -c "
+        NODE_ENV=test node src/workers/parse-course-csv.js
+        && npm start
+      "
+
+  postgres:
+    image: postgres:13.3-alpine
+    restart: unless-stopped
     volumes:
-      - .:/usr/src/node-app
-    command:
-      npm run start
+      - db-data:/var/lib/postgresql/data # persistent data
+    ports:
+      - "5432:5432"
+    networks:
+      - default
+    env_file:
+      - .env.docker # set up postgres (see .env.docker.example)
+
+volumes:
+  db-data:
