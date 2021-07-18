@@ -97,7 +97,8 @@ const readCSV = async (filePath) => {
     // if (!record.subjects.includes(subjectCode)) batch.subjectData.push(subjectData);
     // if (!record.courses.includes(courseCode)) batch.courseData.push(courseData);
     if (!record.subjects.includes(sectionFullCode)) batch.subjectData.push(subjectData);
-    if (!record.courses.includes(sectionFullCode)) batch.courseData.push(courseData);
+    // if (!record.courses.includes(sectionFullCode)) batch.courseData.push(courseData);
+    batch.courseData.push(courseData);
     batch.sectionData.push(sectionData);
 
     // record subject & course for above step in the next loop

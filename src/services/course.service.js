@@ -67,7 +67,7 @@ const searchCourses = async (options) => {
     ].filter((x) => x.length > 0);
 
     const dbOptions = {
-      attributes: ['subject', 'code', 'name'],
+      attributes: ['subject', 'code', 'name', 'description', 'credit_hours', 'degree_attributes', 'schedule_info', 'section_info'],
       where: { [Op.or]: orQueries },
       order: resultOrder,
       limit: Math.max(10, perPage),
@@ -90,6 +90,7 @@ const searchCourses = async (options) => {
       tmpSections[courseFullCode] = await searchSections({ code: courseFullCode });
     }
 
+    console.log(courses)
     courses = courses.map((course) => {
       const courseFullCode = `${course.subject}${course.code}`;
       let sections = tmpSections[courseFullCode];
