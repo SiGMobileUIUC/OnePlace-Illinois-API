@@ -3,6 +3,7 @@ const path = require('path');
 const Papa = require('papaparse');
 
 const { sequelize, Subjects, Courses, CoursesOffered, Sections } = require('../models');
+const subjectCodeToName = require('../../data/2021-subjects.json');
 
 const readCSV = async (filePath) => {
   const csvFile = await fs.promises.readFile(filePath);
@@ -22,7 +23,7 @@ const readCSV = async (filePath) => {
   const filePath = path.join(__dirname, `../../data/${year}-${term}.csv`);
   const allSections = await readCSV(filePath);
 
-  const shouldResetDatabase = false;
+  const shouldResetDatabase = true;
   await sequelize.sync({ force: shouldResetDatabase }).then(() => {
     console.log('Restarted db');
   });
@@ -54,14 +55,19 @@ const readCSV = async (filePath) => {
     // eslint-disable-next-line no-continue
     if (!courseName || !subjectCode || !courseCode) continue;
 
-    // for now, make name equal to subjectCode
-    const subjectData = { code: subjectCode, name: subjectCode };
+    const subjectData = { code: subjectCode, name: subjectCodeToName[subjectCode] || subjectCode };
+
     const courseData = {
       subject: subjectCode, // e.g. CS
       code: Number(courseCode), // e.g. 124
       full_code: courseFullCode, // e.g. CS_124
       name: courseName, // e.g. Introduction to Computer Science I
+      // optional
       description: courseDesc,
+      credit_hours: section['Credit Hours'] || '',
+      degree_attributes: section['Degree Attributes'] || '', // e.g. Gen Ed or Adv Composition
+      schedule_info: section['Schedule Information'] || '',
+      section_info: section['Section Info'] || '', // e.g. Pre-req
     };
 
     const sectionData = {
@@ -72,10 +78,9 @@ const readCSV = async (filePath) => {
       course: courseFullCode, // e.g. CS_124
       // optionals below
       code: section.Section || '', // e.g. AD1 (may not exist)
-      title: section['Section Title'] || '',
-      info: section['Section Info'] || '',
       part_of_term: section['Part of Term'] || '',
-      credit_hours: section['Credit Hours'] || '',
+      section_title: section['Section Title'] || '',
+      section_credit_hours: section['Section Credit Hours'] || '',
       section_status: section['Section Status'] || '',
       enrollment_status: section['Enrollment Status'] || '',
       type: section.Type || '',
