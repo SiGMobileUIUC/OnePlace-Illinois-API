@@ -1,15 +1,20 @@
 # Dependencies
 node_modules
 
-# yarn error logs
-yarn-error.log
-
 # Environment varibales
 .env*
 !.env*.example
+
+# IDE
+.vscode/
+.idea/
+.editorconfig
 
 # Code coverage
 coverage
 
 # Server Firebase
 serviceAccountKey.json
+
+# misc
+.DS_Store

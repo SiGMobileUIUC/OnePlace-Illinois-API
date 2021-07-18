@@ -1,34 +1,34 @@
 const express = require('express');
-const docsRoute = require('./docs.route');
-const coursesRoute = require('./course.route');
-const config = require('../../config/config');
+
+// const config = require('../../config/config');
+const courseRoute = require('./course.route');
+const sectionRoute = require('./section.route');
+// const libraryRoute = require('./library.route');
+// const userRoute = require('./user.route');
 
 const router = express.Router();
 
 const defaultRoutes = [
   {
     path: '/course',
-    route: coursesRoute,
-  }
-];
-
-const devRoutes = [
-  // routes available only in development mode
-  {
-    path: '/docs',
-    route: docsRoute,
+    route: courseRoute,
   },
+  {
+    path: '/section',
+    route: sectionRoute,
+  },
+  // {
+  //   path: '/library',
+  //   route: libraryRoute,
+  // },
+  // {
+  //   path: '/user',
+  //   route: userRoute,
+  // },
 ];
 
 defaultRoutes.forEach((route) => {
   router.use(route.path, route.route);
 });
-
-/* istanbul ignore next */
-if (config.env === 'development') {
-  devRoutes.forEach((route) => {
-    router.use(route.path, route.route);
-  });
-}
 
 module.exports = router;
