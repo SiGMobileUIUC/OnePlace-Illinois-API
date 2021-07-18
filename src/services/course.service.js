@@ -5,6 +5,7 @@ const { Op, literal } = require('sequelize');
 
 const ApiError = require('../utils/ApiError');
 const { Courses } = require('../models');
+const { searchSections } = require('./section.service');
 
 const isUpperCase = (str) => str === str.toUpperCase();
 
@@ -15,7 +16,7 @@ const isUpperCase = (str) => str === str.toUpperCase();
  */
 const searchCourses = async (options) => {
   try {
-    const { keyword } = options;
+    const { keyword, page, per_page: perPage, only_courses: onlyCourses } = options;
     const keywordArr = keyword.split(' ');
 
     /*
@@ -68,11 +69,15 @@ const searchCourses = async (options) => {
       attributes: ['subject', 'code', 'name'],
       where: { [Op.or]: orQueries },
       order: resultOrder,
+      limit: Math.max(10, perPage),
+      offset: Math.max(0, perPage * (page - 1)),
     };
 
     /*
         Search and refine matched courses
      */
+
+    // const foundCount = await Courses.count({ where: { [Op.or]: orQueries }});
 
     let courses = await Courses.findAll(dbOptions);
     courses = courses.map((course) => ({
@@ -80,6 +85,27 @@ const searchCourses = async (options) => {
       subjectNumber: course.code,
       name: course.name,
     }));
+
+    // return only course data
+    if (onlyCourses) return courses;
+
+    /*
+        Get Section data for each Course and return Both
+        Each section will have its own course data
+        TODO: Unify the course data & nest sections under one same course
+     */
+    const tmpSections = {};
+    const attributes = ['year', 'term', 'CRN', 'code', 'title', 'info', 'part_of_term', 'credit_hours', 'section_status', 'enrollment_status', 'type', 'type_code', 'start_time', 'end_time', 'days_of_week', 'room', 'building', 'instructors'];
+
+    // eslint-disable-next-line no-restricted-syntax
+    for (const course of courses) {
+      const courseFullCode = `${course.subjectId}${course.subjectNumber}`;
+      tmpSections[courseFullCode] = await searchSections({ code: courseFullCode }, { attributes });
+    }
+
+    courses.forEach((course) => {
+      course.sections = tmpSections[`${course.subjectId}${course.subjectNumber}`];
+    });
 
     return courses;
   } catch (e) {

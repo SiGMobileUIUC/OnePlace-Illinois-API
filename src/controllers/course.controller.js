@@ -5,7 +5,7 @@ const catchAsync = require('../utils/catchAsync');
 const { courseService } = require('../services');
 
 const search = catchAsync(async (req, res) => {
-  const options = pick(req.query, ['keyword']);
+  const options = pick(req.query, ['keyword', 'page', 'per_page', 'only_courses']);
   const courses = await courseService.searchCourses(options);
 
   if (!courses) {
