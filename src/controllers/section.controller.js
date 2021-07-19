@@ -5,7 +5,7 @@ const catchAsync = require('../utils/catchAsync');
 const { sectionService } = require('../services');
 
 const search = catchAsync(async (req, res) => {
-  const options = pick(req.query, ['code']);
+  const options = pick(req.query, ['code', 'CRN']);
   const sections = await sectionService.searchSections(options);
 
   if (!sections) {

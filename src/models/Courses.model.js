@@ -25,8 +25,25 @@ module.exports = {
     type: DataTypes.STRING,
     allowNull: false,
   },
+  // optional
   description: {
     type: DataTypes.TEXT, // Postgres doesn't support text with option (e.g. tinytext)
+    allowNull: true,
+  },
+  credit_hours: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  degree_attributes: {
+    type: DataTypes.TEXT,
+    allowNull: true,
+  },
+  schedule_info: {
+    type: DataTypes.TEXT,
+    allowNull: true,
+  },
+  section_info: {
+    type: DataTypes.TEXT,
     allowNull: true,
   },
 };

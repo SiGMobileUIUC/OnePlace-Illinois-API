@@ -4,6 +4,35 @@ const ApiError = require('../utils/ApiError');
 const { Sections } = require('../models');
 const { isArray } = require('../utils');
 
+const sectionAttributes = ['year', 'term', 'CRN', 'full_code', 'course', 'code', 'part_of_term', 'section_title', 'section_status', 'section_credit_hours', 'enrollment_status', 'type', 'type_code', 'start_time', 'end_time', 'days_of_week', 'room', 'building', 'instructors'];
+
+const searchOne = async (options, internal = {}) => {
+  try {
+    const { code, CRN } = options;
+    let { attributes } = internal;
+
+    if (!isArray(attributes) || !attributes.length) attributes = sectionAttributes;
+
+    const codeLetters = code.replace(/[0-9]/g, '');
+    const codeDigits = code.replace(/[a-zA-Z]/g, '');
+    const courseCode = `${codeLetters}_${codeDigits}`;
+
+    const dbCondition = { course: courseCode };
+    if (typeof CRN === 'number') dbCondition.CRN = CRN;
+
+    const dbOptions = {
+      attributes,
+      where: dbCondition,
+      order: [['year', 'desc'], ['term', 'desc']], // term 'fall' should come before 'spring'
+    };
+
+    return await Sections.findOne(dbOptions);
+  } catch (e) {
+    console.log(e);
+    throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Internal server error');
+  }
+};
+
 /**
  * Search sections on local Postgres
  * @param {object} options
@@ -12,26 +41,28 @@ const { isArray } = require('../utils');
  */
 const searchSections = async (options, internal = {}) => {
   try {
-    const { code } = options;
-    let { attributes } = internal;
+    const { code, CRN } = options;
+    let { attributes, justOne } = internal;
 
-    if (!isArray(attributes) || !attributes.length) {
-      attributes = ['year', 'term', 'CRN', 'full_code', 'course', 'code', 'title', 'info', 'part_of_term', 'credit_hours', 'section_status', 'enrollment_status', 'type', 'type_code', 'start_time', 'end_time', 'days_of_week', 'room', 'building', 'instructors'];
-    }
+    if (!isArray(attributes) || !attributes.length) attributes = sectionAttributes;
+    if (typeof justOne !== 'boolean') justOne = false;
 
     const codeLetters = code.replace(/[0-9]/g, '');
     const codeDigits = code.replace(/[a-zA-Z]/g, '');
     const courseCode = `${codeLetters}_${codeDigits}`;
 
+    console.log(courseCode);
+
+    const dbCondition = { course: courseCode };
+    if (typeof CRN === 'number') dbCondition.CRN = CRN;
+
     const dbOptions = {
       attributes,
-      where: { course: courseCode },
-      order: [
-        ['year', 'desc'],
-      ],
+      where: dbCondition,
+      order: [['year', 'desc']],
     };
 
-    return await Sections.findAll(dbOptions);
+    return justOne ? Sections.findOne(dbOptions) : Sections.findAll(dbOptions);
   } catch (e) {
     console.log(e);
     throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Internal server error');
@@ -39,5 +70,6 @@ const searchSections = async (options, internal = {}) => {
 };
 
 module.exports = {
+  searchOne,
   searchSections,
 };

@@ -34,23 +34,19 @@ module.exports = {
     type: DataTypes.STRING,
     allowNull: true,
   },
-  title: {
-    type: DataTypes.STRING,
-    allowNull: true,
-  },
-  info: {
-    type: DataTypes.TEXT,
-    allowNull: true,
-  },
   part_of_term: {
     type: DataTypes.STRING,
     allowNull: true,
   },
-  credit_hours: {
+  section_title: {
     type: DataTypes.STRING,
     allowNull: true,
   },
   section_status: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  section_credit_hours: {
     type: DataTypes.STRING,
     allowNull: true,
   },
