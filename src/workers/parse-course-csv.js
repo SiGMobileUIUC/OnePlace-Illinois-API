@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const Papa = require('papaparse');
 
-const { sequelize, Subjects, Courses, CoursesOffered, Sections } = require('../models');
+const { sequelize, Subjects, Courses, Sections } = require('../models');
 const subjectCodeToName = require('../../data/2021-subjects.json');
 
 const readCSV = async (filePath) => {
@@ -24,7 +24,8 @@ const readCSV = async (filePath) => {
   const allSections = await readCSV(filePath);
 
   const shouldResetDatabase = true;
-  await sequelize.sync({ force: shouldResetDatabase }).then(() => {
+  await sequeli
+  ze.sync({ force: shouldResetDatabase }).then(() => {
     console.log('Restarted db');
   });
 

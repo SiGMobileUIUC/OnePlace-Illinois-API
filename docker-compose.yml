@@ -25,6 +25,7 @@ services:
     # *** use 'sh' since alpine doesn't support 'bash' ***
     command: sh -c "
         NODE_ENV=test node src/workers/parse-course-csv.js
+        && npm ci
         && npm start
       "
 
@@ -34,7 +35,7 @@ services:
     volumes:
       - db-data:/var/lib/postgresql/data # persistent data
     ports:
-      - "5432:5432"
+      - "5435:5435" # unusual port!
     networks:
       - default
     env_file:
