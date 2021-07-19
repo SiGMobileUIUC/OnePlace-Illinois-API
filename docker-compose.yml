@@ -16,7 +16,7 @@ services:
     networks:
       - default
     env_file:
-      - .env.docker # postgres env data
+      - .env.docker # postgres env data & app's PORT
     environment:
       # https://docs.docker.com/docker-for-mac/networking/#use-cases-and-workarounds
       # POSTGRES_HOST -- host.docker.internal (Docker figures out host for us) and avoid using 127.0.0.1 (localhost)

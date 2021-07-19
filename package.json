@@ -19,9 +19,7 @@
     "coverage:coveralls": "jest -i --coverage --coverageReporters=text-lcov | coveralls",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "docker:prod": "docker-compose -f docker-compose.yml -f docker-compose.prod.yml up",
-    "docker:dev": "docker-compose -f docker-compose.yml -f docker-compose.dev.yml up",
-    "docker:test": "docker-compose -f docker-compose.yml -f docker-compose.test.yml up"
+    "docker": "docker-compose -f docker-compose.yml up --build -d"
   },
   "keywords": [
     "node",
