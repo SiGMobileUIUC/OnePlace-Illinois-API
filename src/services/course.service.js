@@ -87,15 +87,18 @@ const searchCourses = async (options) => {
 
     for (const course of courses) {
       const courseFullCode = `${course.subject}${course.code}`;
-      tmpSections[courseFullCode] = await searchSections({ code: courseFullCode });
+      const internalOptions = {
+        attributes: ['year', 'term', 'CRN', 'code', 'part_of_term', 'section_title', 'section_status', 'section_credit_hours', 'enrollment_status', 'type', 'type_code', 'start_time', 'end_time', 'days_of_week', 'room', 'building', 'instructors'],
+      };
+      tmpSections[courseFullCode] = await searchSections({ code: courseFullCode }, internalOptions);
     }
 
-    console.log(courses)
     courses = courses.map((course) => {
       const courseFullCode = `${course.subject}${course.code}`;
-      let sections = tmpSections[courseFullCode];
+      const sections = tmpSections[courseFullCode];
 
-      const sectionLinks = sections.map((section) => `/api/v1/section/search?code=${courseFullCode}&CRN=${section.CRN}`);
+      // const sectionLinks = sections.map((section) => `/api/v1/section/search?code=${courseFullCode}&CRN=${section.CRN}`);
+      const sectionLinks = sections.map((section) => `${section.code}_${section.CRN}`);
       const { year, term } = sections[0].dataValues; // get from the first section
       let termID = 'fa';
       if (term === 'spring') termID = 'sp';
@@ -112,35 +115,21 @@ const searchCourses = async (options) => {
         description: course.description,
         creditHours: course.credit_hours,
         courseSectionInformation: course.section_info,
-        genEdCategories: course.degree_attributes,
-        sectionsLinks: sectionLinks,
+        genEd: course.degree_attributes,
+        sections: sectionLinks,
       };
     });
 
-    return courses;
-
     // return only course data
-    // if (onlyCourses) return courses;
-    //
-    // /*
-    //     Get Section data for each Course and return Both
-    //     Each section will have its own course data
-    //     TODO: Unify the course data & nest sections under one same course
-    //  */
-    // const tmpSections = {};
-    // const attributes = ['year', 'term', 'CRN', 'code', 'title', 'info', 'part_of_term', 'credit_hours', 'section_status', 'enrollment_status', 'type', 'type_code', 'start_time', 'end_time', 'days_of_week', 'room', 'building', 'instructors'];
-    //
-    // // eslint-disable-next-line no-restricted-syntax
-    // for (const course of courses) {
-    //   const courseFullCode = `${course.subjectId}${course.subjectNumber}`;
-    //   tmpSections[courseFullCode] = await searchSections({ code: courseFullCode }, { attributes });
-    // }
-    //
-    // courses.forEach((course) => {
-    //   course.sections = tmpSections[`${course.subjectId}${course.subjectNumber}`];
-    // });
-    //
-    // return courses;
+    if (onlyCourses) return courses;
+
+    courses = courses.map((course) => {
+      const courseFullCode = `${course.subjectId}${course.courseId}`;
+      course.sections = tmpSections[courseFullCode];
+      return course;
+    });
+
+    return courses;
   } catch (e) {
     console.log(e);
     throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Internal server error');
