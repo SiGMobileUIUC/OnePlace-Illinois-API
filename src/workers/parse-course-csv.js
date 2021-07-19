@@ -24,8 +24,7 @@ const readCSV = async (filePath) => {
   const allSections = await readCSV(filePath);
 
   const shouldResetDatabase = true;
-  await sequeli
-  ze.sync({ force: shouldResetDatabase }).then(() => {
+  await sequelize.sync({ force: shouldResetDatabase }).then(() => {
     console.log('Restarted db');
   });
 
