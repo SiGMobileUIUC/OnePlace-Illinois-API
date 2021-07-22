@@ -100,9 +100,10 @@ const searchCourses = async (options) => {
       // const sectionLinks = sections.map((section) => `/api/v1/section/search?code=${courseFullCode}&CRN=${section.CRN}`);
       const sectionLinks = sections.map((section) => `${section.code}_${section.CRN}`);
       const { year, term } = sections[0].dataValues; // get from the first section
-      let termID = 'fa';
-      if (term === 'spring') termID = 'sp';
-      else if (term === 'summer') termID = 'su';
+      const termID = ['fall', 'spring', 'summer'].indexOf(term);
+      // courses with multiple Gen Eds (e.g. ANTH 103 or GEOG 101) are separated with ", and" in the csv
+      // so remove "and", split by "," and remove "course."
+      const genEds = course.degree_attributes.replace(/\sand\s/, ' ').split(',').map((genEd) => genEd.replace(/\scourse.$/, ''));
 
       return {
         year,
@@ -115,7 +116,8 @@ const searchCourses = async (options) => {
         description: course.description,
         creditHours: course.credit_hours,
         courseSectionInformation: course.section_info,
-        genEd: course.degree_attributes,
+        classScheduleInformation: course.schedule_info,
+        genEd: genEds,
         sections: sectionLinks,
       };
     });

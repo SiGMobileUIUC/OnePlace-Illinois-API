@@ -10,8 +10,9 @@ services:
       - postgres
     volumes:
       - .:/usr/src/oneplace-illinois-api
+#      - ./node_modules:/usr/src/oneplace-illinois-api/node_modules
     ports:
-      - '80:80'
+      #- '80:80'
       - '3000:3000' # for alternative local dev
     networks:
       - default
@@ -20,12 +21,12 @@ services:
     environment:
       # https://docs.docker.com/docker-for-mac/networking/#use-cases-and-workarounds
       # POSTGRES_HOST -- host.docker.internal (Docker figures out host for us) and avoid using 127.0.0.1 (localhost)
-      POSTGRES_HOST: host.docker.internal
+      #POSTGRES_HOST: host.docker.internal
+      POSTGRES_HOST: 172.17.0.1 # host.docker.internal doesn't work on older Docker or just doesn't work.
     # Run multiple commands
     # *** use 'sh' since alpine doesn't support 'bash' ***
     command: sh -c "
         NODE_ENV=test node src/workers/parse-course-csv.js
-        && npm ci
         && npm start
       "
 
@@ -35,7 +36,7 @@ services:
     volumes:
       - db-data:/var/lib/postgresql/data # persistent data
     ports:
-      - "5435:5435" # unusual port!
+      - "5435:5432" # unusual port 5435!
     networks:
       - default
     env_file:
