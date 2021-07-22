@@ -103,7 +103,7 @@ const searchCourses = async (options) => {
       const termID = ['fall', 'spring', 'summer'].indexOf(term);
       // courses with multiple Gen Eds (e.g. ANTH 103 or GEOG 101) are separated with ", and" in the csv
       // so remove "and", split by "," and remove "course."
-      const genEds = course.degree_attributes.replace(/\sand\s/, ' ').split(',').map((genEd) => genEd.replace(/\scourse.$/, ''));
+      const genEds = course.degree_attributes.replace(/\sand\s/, ' ').split(',').map((genEd) => genEd.replace(/\scourse.$/, '')).filter((x) => x);
 
       return {
         year,
