@@ -36,7 +36,9 @@ services:
     volumes:
       - db-data:/var/lib/postgresql/data # persistent data
     ports:
-      - "5435:5432" # unusual port 5435!
+      # change to "5435:5432" if the server's port 5435 is already being used (by another docker or local Postgres)
+      # then, make sure Sequelize connects to Postgres on port: 5435
+      - "5432:5432"
     networks:
       - default
     env_file:
