@@ -123,7 +123,7 @@ const searchCourses = async (options) => {
     });
 
     // return only course data
-    if (onlyCourses) return courses;
+    if ((typeof onlyCourses === 'boolean' && onlyCourses) || onlyCourses === 'true') return courses;
 
     courses = courses.map((course) => {
       const courseFullCode = `${course.subjectId}${course.courseId}`;
