@@ -26,7 +26,7 @@ module.exports = {
     unique: true,
   },
   course: {
-    type: DataTypes.STRING(20),
+    type: DataTypes.STRING,
     allowNull: false,
   },
   // optionals

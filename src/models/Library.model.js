@@ -8,7 +8,7 @@ module.exports = {
     primaryKey: true,
     unique: true,
   },
-  user_email: {
+  email: {
     type: DataTypes.STRING,
     allowNull: false,
   },
@@ -17,7 +17,16 @@ module.exports = {
     allowNull: false,
   },
   section: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+  },
+  full_code: {
     type: DataTypes.STRING,
-    allowNull: true,
+    allowNull: false,
+  },
+  is_active: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defautValue: true,
   },
 };

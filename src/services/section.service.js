@@ -13,11 +13,11 @@ const searchOne = async (options, internal = {}) => {
 
     if (!isArray(attributes) || !attributes.length) attributes = sectionAttributes;
 
-    const codeLetters = code.replace(/[0-9]/g, '');
-    const codeDigits = code.replace(/[a-zA-Z]/g, '');
-    const courseCode = `${codeLetters}_${codeDigits}`;
+    // const codeLetters = code.replace(/[0-9]/g, '');
+    // const codeDigits = code.replace(/[a-zA-Z]/g, '');
+    // const courseCode = `${codeLetters}${codeDigits}`;
 
-    const dbCondition = { course: courseCode };
+    const dbCondition = { course: code };
     if (typeof CRN === 'number') dbCondition.CRN = CRN;
 
     const dbOptions = {
@@ -47,13 +47,11 @@ const searchSections = async (options, internal = {}) => {
     if (!isArray(attributes) || !attributes.length) attributes = sectionAttributes;
     if (typeof justOne !== 'boolean') justOne = false;
 
-    const codeLetters = code.replace(/[0-9]/g, '');
-    const codeDigits = code.replace(/[a-zA-Z]/g, '');
-    const courseCode = `${codeLetters}_${codeDigits}`;
+    // const codeLetters = code.replace(/[0-9]/g, '');
+    // const codeDigits = code.replace(/[a-zA-Z]/g, '');
+    // const courseCode = `${codeLetters}_${codeDigits}`;
 
-    console.log(courseCode);
-
-    const dbCondition = { course: courseCode };
+    const dbCondition = { course: code };
     if (typeof CRN === 'number') dbCondition.CRN = CRN;
 
     const dbOptions = {

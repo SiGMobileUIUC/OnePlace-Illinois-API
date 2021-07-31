@@ -21,8 +21,16 @@ if (config.env !== 'test') {
   app.use(morgan.errorHandler);
 }
 
+passport.serializeUser((user, done) => done(null, user.id));
+passport.deserializeUser((obj, done) => done(null, obj));
+
+// ignore warnings since JwtStrategy extends Strategy (Passport)
+passport.use('jwt', jwtStrategy);
+
+// TODO: Server fails to return response (hangs client) when a given token's Key Identifier has no record
+
 // `force: true` resets the database
-const shouldResetDatabase = false;
+const shouldResetDatabase = process.env.RESET_DB || false;
 db.sequelize.sync({ force: shouldResetDatabase }).then(() => {
   console.log('Restarted db');
 });
@@ -46,9 +54,9 @@ app.use(compression());
 app.use(cors());
 app.options('*', cors());
 
-// jwt authentication
-// app.use(passport.initialize());
-// passport.use('jwt', jwtStrategy);
+// JWT authentication
+app.use(passport.initialize());
+// app.use(passport.session());
 
 // v1 api routes
 app.use('/api/v1', routes);

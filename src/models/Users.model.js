@@ -16,21 +16,24 @@ module.exports = {
       isEmail: true,
     },
   },
-  token: {
+  // name: {
+  //   type: DataTypes.STRING,
+  //   allowNull: true,
+  // },
+  // from Firebase Authentication JWT token
+  uid: {
     type: DataTypes.STRING,
     allowNull: false,
-    // validate: {
-    //   isJWT: true,
-    // },
+    unique: true,
   },
-  lastLogin: {
+  last_login: {
     type: 'TIMESTAMP',
     // defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
     allowNull: false,
   },
-  isLoggedIn: {
-    type: DataTypes.BOOLEAN,
+  // should be the same as Server token's expiration time
+  login_expiration: {
+    type: 'TIMESTAMP',
     allowNull: false,
-    defaultValue: false,
   },
 };

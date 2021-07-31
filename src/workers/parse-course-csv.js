@@ -48,7 +48,7 @@ const readCSV = async (filePath) => {
       Number: courseCode,
       Description: courseDesc,
     } = section;
-    const courseFullCode = `${subjectCode}_${courseCode}`;
+    const courseFullCode = `${subjectCode}${courseCode}`;
     const sectionFullCode = `${courseFullCode}_${section.CRN}`;
 
     // skip weird data
@@ -60,7 +60,7 @@ const readCSV = async (filePath) => {
     const courseData = {
       subject: subjectCode, // e.g. CS
       code: Number(courseCode), // e.g. 124
-      full_code: courseFullCode, // e.g. CS_124
+      full_code: courseFullCode, // e.g. CS124
       name: courseName, // e.g. Introduction to Computer Science I
       // optional
       description: courseDesc,
@@ -74,8 +74,8 @@ const readCSV = async (filePath) => {
       year: Number(section.Year) || year,
       term: section.Term.toLowerCase() || term,
       CRN: Number(section.CRN), // e.g. 74402
-      full_code: sectionFullCode, // e.g. CS_124_74402
-      course: courseFullCode, // e.g. CS_124
+      full_code: sectionFullCode, // e.g. CS124_74402
+      course: courseFullCode, // e.g. CS124
       // optionals below
       code: section.Section || '', // e.g. AD1 (may not exist)
       part_of_term: section['Part of Term'] || '',

@@ -58,7 +58,7 @@ const searchCourses = async (options) => {
     // order by more matches first (remove the empty []'s when conditions don't match)
     const resultOrder = [
       // first prioritize the subject_code
-      inKeyword.subjectCode && inKeyword.courseCode ? [literal(`CASE WHEN full_code = '${inKeyword.subjectCode}_${inKeyword.courseCode}' THEN 1 ELSE 4 END`), 'asc'] : [],
+      inKeyword.subjectCode && inKeyword.courseCode ? [literal(`CASE WHEN full_code = '${inKeyword.subjectCode}${inKeyword.courseCode}' THEN 1 ELSE 4 END`), 'asc'] : [],
       // then the course code
       inKeyword.courseCode ? [literal(`CASE WHEN code = ${inKeyword.courseCode} THEN 2 ELSE 4 END`), 'asc'] : [],
       // then the subject code

@@ -3,8 +3,8 @@ const express = require('express');
 // const config = require('../../config/config');
 const courseRoute = require('./course.route');
 const sectionRoute = require('./section.route');
-// const libraryRoute = require('./library.route');
-// const userRoute = require('./user.route');
+const libraryRoute = require('./library.route');
+const userRoute = require('./user.route');
 
 const router = express.Router();
 
@@ -17,14 +17,14 @@ const defaultRoutes = [
     path: '/section',
     route: sectionRoute,
   },
-  // {
-  //   path: '/library',
-  //   route: libraryRoute,
-  // },
-  // {
-  //   path: '/user',
-  //   route: userRoute,
-  // },
+  {
+    path: '/library',
+    route: libraryRoute,
+  },
+  {
+    path: '/user',
+    route: userRoute,
+  },
 ];
 
 defaultRoutes.forEach((route) => {

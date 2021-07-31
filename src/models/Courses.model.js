@@ -8,7 +8,7 @@ module.exports = {
     unique: true,
   },
   subject: {
-    type: DataTypes.STRING(10),
+    type: DataTypes.STRING,
     allowNull: false,
   },
   code: {
@@ -16,7 +16,7 @@ module.exports = {
     allowNull: false,
   },
   full_code: {
-    type: DataTypes.STRING(20),
+    type: DataTypes.STRING,
     allowNull: false,
     primaryKey: true,
     unique: true,
