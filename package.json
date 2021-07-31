@@ -20,7 +20,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "docker": "docker-compose -f docker-compose.yml up --build -d",
-    "parse-cis": "NODE_ENV=test node parse-course-csv.js"
+    "parse-cis": "NODE_ENV=test node src/workers/parse-course-csv.js"
   },
   "keywords": [
     "node",
