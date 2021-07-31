@@ -27,7 +27,7 @@ services:
     # Run multiple commands
     # *** use 'sh' since alpine doesn't support 'bash' ***
     command: sh -c "
-        NODE_ENV=test node src/workers/parse-course-csv.js
+        npm run parse-cis
         && npm start
       "
 
@@ -38,7 +38,8 @@ services:
       - db-data:/var/lib/postgresql/data # persistent data
     ports:
       # change to "5435:5432" if the server's port 5435 is already being used (by another docker or local Postgres)
-      # then, make sure Sequelize connects to Postgres on port: 5435
+      # then, make sure Sequelize connects to Postgres on port: 5435 (inside docker, Postgres runs on 5432)
+      # ** change at config/config.js -> postgres.sequelize_port: 5432 **
       - "5432:5432"
     networks:
       - default
