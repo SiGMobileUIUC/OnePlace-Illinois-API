@@ -26,8 +26,10 @@ services:
       POSTGRES_HOST: postgres
     # Run multiple commands
     # *** use 'sh' since alpine doesn't support 'bash' ***
+    # 'npm i papaparse' because node throws error 'papaparse uninstalled' (even after npm ci). Idk why...
     command: sh -c "
-        npm run parse-cis
+        npm i papaparse
+        && npm run parse-cis
         && npm start
       "
 
