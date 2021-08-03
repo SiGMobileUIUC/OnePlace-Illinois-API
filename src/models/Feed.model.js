@@ -6,13 +6,19 @@ const FeedItemType = {
   Section: 'Section',
 };
 
-module.exports = {
+const FeedActionType = {
+  created: {
+    newSubscriber: 'created__new_subscriber',
+  },
+};
+
+module.exports.FeedModel = {
   _id: {
     type: DataTypes.UUID,
     defaultValue: DataTypes.UUIDV4,
     primaryKey: true,
   },
-  user_email: {
+  email: {
     type: DataTypes.STRING,
     allowNull: false,
     validate: {
@@ -51,4 +57,6 @@ module.exports = {
     },
   },
 };
+
 module.exports.FeedItemType = FeedItemType;
+module.exports.FeedActionType = FeedActionType;
