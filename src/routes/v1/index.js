@@ -5,6 +5,7 @@ const courseRoute = require('./course.route');
 const sectionRoute = require('./section.route');
 const libraryRoute = require('./library.route');
 const userRoute = require('./user.route');
+const feedRoute = require('./feed.route');
 
 const router = express.Router();
 
@@ -24,6 +25,10 @@ const defaultRoutes = [
   {
     path: '/user',
     route: userRoute,
+  },
+  {
+    path: '/feed',
+    route: feedRoute,
   },
 ];
 

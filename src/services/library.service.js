@@ -1,7 +1,8 @@
 const httpStatus = require('http-status');
 
 const ApiError = require('../utils/ApiError');
-const { Library, Courses, Sections } = require('../models');
+const { Library, Courses, Sections, Feed } = require('../models');
+const { FeedItemType } = require('../models/Feed.model');
 
 async function checkCourseAndSection(course, section) {
   const prelimError = new ApiError(httpStatus.BAD_REQUEST, '');
@@ -76,7 +77,17 @@ const add = async (options) => {
 
     const inserted = await Library.create(condition);
 
-    console.log(inserted);
+    await Feed.create({
+      user_email: email,
+      section_full_code: `${course}_${section}`,
+      item_id: `${course}_${section}`,
+      type: FeedItemType.Section,
+      body: 'You subscribed to the section ' + `${course}_${section}`,
+      post_date: new Date(),
+      action: 'just got a new subscriber',
+      attachment_url: null,
+    });
+
     // TODO: cleanup unnecessary part of the data returned
     return { status: 'success', error: null, payload: inserted };
   } catch (e) {
@@ -103,7 +114,27 @@ const drop = async (options) => {
 
     const dropCount = await Library.destroy(dbOptions);
 
-    if (dropCount > 0) return { status: 'success', error: null, payload: { count: dropCount } };
+    if (dropCount > 0) {
+      const feedQuery = {
+        user_email: email,
+        section_full_code: `${course}_${section}`,
+        type: FeedItemType.Section,
+        action: 'just got a new subscriber',
+      };
+
+      const feedItem = await Feed.findOne({
+        where: feedQuery,
+      });
+
+      console.log(feedItem);
+      if (feedItem) {
+        Feed.destroy({
+          where: feedQuery,
+        });
+      }
+
+      return { status: 'success', error: null, payload: { count: dropCount } };
+    }
 
     return { status: 'no-match', error: null, payload: {} };
   } catch (e) {
