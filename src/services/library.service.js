@@ -126,7 +126,6 @@ const drop = async (options) => {
         where: feedQuery,
       });
 
-      console.log(feedItem);
       if (feedItem) {
         Feed.destroy({
           where: feedQuery,
