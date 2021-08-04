@@ -1,7 +1,10 @@
 const httpStatus = require('http-status');
 
 const ApiError = require('../utils/ApiError');
-const { Library, Courses, Sections } = require('../models');
+const { Library, Courses, Sections, Feed } = require('../models');
+const { FeedItemType, FeedActionType } = require('../models/Feed.model');
+const FeedService = require('./feed.service');
+
 
 async function checkCourseAndSection(course, section) {
   const prelimError = new ApiError(httpStatus.BAD_REQUEST, '');
@@ -69,14 +72,20 @@ const add = async (options) => {
 
     await checkCourseAndSection(course, section);
 
-    const condition = { email, course, section, full_code: `${course}_${section}`, is_active: true };
+    const full_code = `${course}_${section}`;
+    const condition = { email, course, section, full_code, is_active: true };
 
     const record = await Library.findOne({ where: condition });
     if (record) return { status: 'already-exists', error: null, payload: {} };
 
     const inserted = await Library.create(condition);
 
-    console.log(inserted);
+    await FeedService.create({
+      email, course, section,
+      postDate: new Date(),
+      action: FeedActionType.created.newSubscriber,
+    });
+
     // TODO: cleanup unnecessary part of the data returned
     return { status: 'success', error: null, payload: inserted };
   } catch (e) {
@@ -103,7 +112,20 @@ const drop = async (options) => {
 
     const dropCount = await Library.destroy(dbOptions);
 
-    if (dropCount > 0) return { status: 'success', error: null, payload: { count: dropCount } };
+    if (dropCount > 0) {
+      // at least one course-section was successfully deleted
+
+      const feedQuery = {
+        email,
+        section_full_code: `${course}_${section}`,
+        type: FeedItemType.Section,
+        action: FeedActionType.created.newSubscriber,
+      };
+
+      await Feed.destroy({ where: feedQuery });
+
+      return { status: 'success', error: null, payload: { count: dropCount } };
+    }
 
     return { status: 'no-match', error: null, payload: {} };
   } catch (e) {
@@ -131,7 +153,7 @@ const activationSwitch = async (options, shouldActivate) => {
     if (!record) throw new ApiError(httpStatus.BAD_REQUEST, 'No course-section available for user');
 
     const switchRes = await record.update({ is_active: shouldActivate });
-    console.log(switchRes);
+
     return { status: 'success', error: null, payload: {} };
   } catch (e) {
     console.log(e);
