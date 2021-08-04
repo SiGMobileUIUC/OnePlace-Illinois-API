@@ -5,6 +5,9 @@ const ApiError = require('../utils/ApiError');
 
 const errorConverter = (err, req, res, next) => {
   let error = err;
+  console.log(err)
+  if (!error) return next();
+
   if (!(error instanceof ApiError)) {
     const statusCode = error.statusCode ? httpStatus.BAD_REQUEST : httpStatus.INTERNAL_SERVER_ERROR;
     const message = error.message || httpStatus[statusCode];
@@ -15,6 +18,9 @@ const errorConverter = (err, req, res, next) => {
 
 // eslint-disable-next-line no-unused-vars
 const errorHandler = (err, req, res, next) => {
+  console.log(err)
+  if (!err) return next(); // skip to final responder if not error
+
   let { statusCode, message } = err;
   if (config.env === 'production' && !err.isOperational) {
     statusCode = httpStatus.INTERNAL_SERVER_ERROR;

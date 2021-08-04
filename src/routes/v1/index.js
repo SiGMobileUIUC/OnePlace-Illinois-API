@@ -36,4 +36,8 @@ defaultRoutes.forEach((route) => {
   router.use(route.path, route.route);
 });
 
+// API route catch-all final responder
+// Skips if invalid route
+router.use(finalResponder);
+
 module.exports = router;
