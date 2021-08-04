@@ -1,67 +1,63 @@
-const { Strategy: JwtStrategy, ExtractJwt } = require('passport-jwt');
+const httpStatus = require('http-status');
+const CustomStrategy = require('passport-custom').Strategy;
 const jwt = require('jsonwebtoken');
 
 const config = require('./config');
+const ApiError = require('../utils/ApiError');
+const { getBearerTokenFromHeaders } = require('../utils/auth');
 const { Users } = require('../models');
 const ServerJWT = require('../services/internal/serverJWT.service');
 
-// TODO: check the performance of fetching signing key from DB for every request
-function getJwtSigningKey(req, rawJwtToken, done) {
+// TODO: check the performance of fetching signing key from DB for every request (use Redis if possible)
+async function getJwtSigningKey(token) {
   try {
-    const decoded = jwt.decode(rawJwtToken, { complete: true });
+    const decoded = jwt.decode(token, { complete: true });
     const keyIdentifier = decoded.header.kid;
-    ServerJWT._verifySigningKey(keyIdentifier).then((signingKey) => done(null, signingKey));
+    return await ServerJWT._verifySigningKey(keyIdentifier); // returns signing key
   } catch (e) {
     console.log(e);
-    done(e, null);
+    throw e;
   }
 }
 
-/**
- * Verifies that decoded JWT's email is in record
- * @param decoded Decoded complete JWT
- * @param done
- * @returns {Promise<error, email, key_identifier>}
- */
-async function jwtVerify(decoded, done) {
-  /*
-    decoded_example = {
-      header: { alg: 'HS256', typ: 'JWT', kid: 'this_key_is_rad' },
-      payload: {
-        email: 'example@example.com',
-          iat: 1627661616,
-          exp: 1630253616,
-          aud: 'refresh',
-          iss: 'http://example.com',
-          sub: 'just_random_uid'
-      },
-      signature: 'inMlcU8EJM0FfypVzvElUF2G9ZyiZo8rQ4-Lswlv46U',
-    }
-   */
-  const { header, payload } = decoded;
+const jwtVerifyOpts = {
+  issuer: config.jwt.issuer,
+  audience: 'access',
+  complete: true, // return all data {header, payload, signature}
+};
+
+const jwtStrategyFunction = async (req, done) => {
   try {
+    const jwtToken = getBearerTokenFromHeaders(req);
+
+    /*
+        Get signing key and verify JWT integrity
+     */
+    const signingKey = await getJwtSigningKey(jwtToken);
+    if (!signingKey) throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid key identifier provided for signing key');
+
+    const decoded = jwt.verify(jwtToken, signingKey, jwtVerifyOpts);
+
+    /*
+        Validate JWT against expected data value (ie. token's email is in DB)
+        and retrieve needed info
+     */
+    const { header, payload } = decoded;
     const userID = payload.sub;
     const userRecord = await Users.findOne({ where: { _id: userID }, attributes: ['email'] });
-    if (!userRecord || !userRecord.email) throw new Error('No user record found for token');
+    if (!userRecord || !userRecord.email) throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid email in token');
 
     done(null, userRecord.email, header.kid);
   } catch (e) {
-    console.log(e);
-    done(e, null, null);
+    // console.log(e);
+    if (
+      e instanceof ApiError || e instanceof jwt.JsonWebTokenError
+      || e instanceof jwt.NotBeforeError || e instanceof jwt.TokenExpiredError) {
+      done(e, null, null);
+    } else done(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Internal server error'), null, null);
   }
-}
-
-const jwtOptions = {
-  secretOrKeyProvider: getJwtSigningKey,
-  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-  // READ: https://github.com/mikenicholson/passport-jwt/blob/96a6e5565ba5a6f3301d91959a0f646e54446388/lib/strategy.js#L59
-  jsonWebTokenOptions: {
-    issuer: config.jwt.issuer,
-    audience: 'access',
-    complete: true, // return all data {header, payload, signature}
-  },
 };
 
-const jwtStrategy = new JwtStrategy(jwtOptions, jwtVerify);
+const jwtStrategy = new CustomStrategy(jwtStrategyFunction);
 
 module.exports = { jwtStrategy };
