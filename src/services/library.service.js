@@ -82,6 +82,7 @@ const add = async (options) => {
 
     await FeedService.create({
       email, course, section,
+      postDate: new Date(),
       action: FeedActionType.created.newSubscriber,
     });
 
