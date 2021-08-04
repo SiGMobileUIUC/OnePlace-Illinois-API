@@ -6,6 +6,9 @@ const { deepExtend } = require('../utils/helpers');
  * Final middleware before sending response to user
  */
 const finalResponder = catchAsync(async (req, res) => {
+  console.log(res);
+  //if (res.error === 'Requested path not found') return next();
+
   // READ: http://expressjs.com/en/api.html#res.locals
   const passOn = res.locals;
 

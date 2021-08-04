@@ -12,6 +12,7 @@ const morgan = require('./config/morgan');
 const { jwtStrategy } = require('./config/passport');
 const routes = require('./routes/v1');
 const { errorConverter, errorHandler } = require('./middlewares/error');
+const finalResponder = require('./middlewares/finalResponder');
 const ApiError = require('./utils/ApiError');
 const db = require('./models');
 
@@ -75,5 +76,8 @@ app.use(errorConverter);
 
 // handle error
 app.use(errorHandler);
+
+// use as final response middleware
+app.use(finalResponder);
 
 module.exports = app;

@@ -36,7 +36,4 @@ defaultRoutes.forEach((route) => {
   router.use(route.path, route.route);
 });
 
-// Final middleware for all /api/v1 routes
-router.use('*', finalResponder);
-
 module.exports = router;
