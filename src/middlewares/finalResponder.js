@@ -30,7 +30,8 @@ const finalResponder = catchAsync(async (req, res) => {
     resJson.payload.accessToken = getBearerTokenFromHeaders(req);
   }
 
-  res.send(resJson);
+  if (resJson.error) res.statusCode(passOn.error.statusCode || 500).send(resJson);
+  else res.statusCode(200).send(resJson);
 });
 
 module.exports = finalResponder;
