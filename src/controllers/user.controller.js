@@ -1,4 +1,6 @@
 const httpStatus = require('http-status');
+
+const config = require('../config/config');
 const pick = require('../utils/pick');
 const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
@@ -13,7 +15,17 @@ const loginUser = catchAsync(async (req, res) => {
     throw new ApiError(httpStatus.NOT_FOUND, 'User could not be logged in!');
   }
 
-  res.send({ status: 'success', error: null, payload: loginRes });
+  const { id, email, accessToken, refreshToken } = loginRes;
+
+  // store `refresh` JWT as secure HTTP-only, signed cookie
+  res.cookie('refresh_jwt', refreshToken, {
+    httpOnly: true, // Flags the cookie to be accessible only by the web server.
+    maxAge: 30 * 24 * 60 * 60 * 1000, // expires in 30 days (in ms)
+    secure: config.env !== 'development', // Marks the cookie to be used with HTTPS only.
+    signed: config.env !== 'development', // Indicates if the cookie should be signed.
+  });
+
+  res.send({ status: 'success', error: null, payload: { id, email, accessToken } });
 });
 
 const deleteUser = catchAsync(async (req, res) => {
