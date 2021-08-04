@@ -82,7 +82,7 @@ const add = async (options) => {
     };
 
     const record = await Library.findOne({ where: condition });
-    if (record) return { status: 'already-exists', error: null, payload: {} };
+    if (record) return { msg: "already-exists" };
 
     const inserted = await Library.create(condition);
 
@@ -94,7 +94,7 @@ const add = async (options) => {
     });
 
     // TODO: cleanup unnecessary part of the data returned
-    return { status: 'success', error: null, payload: inserted };
+    return inserted;
   } catch (e) {
     console.log(e);
     if (e.name === 'invalid_course_or_section') throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid course or section');
@@ -132,10 +132,10 @@ const drop = async (options) => {
 
       await Feed.destroy({ where: feedQuery });
 
-      return { status: 'success', error: null, payload: { count: dropCount } };
+      return { count: dropCount };
     }
 
-    return { status: 'no-match', error: null, payload: {} };
+    return { count: dropCount, msg: 'no-match' };
   } catch (e) {
     console.log(e);
     if (e.name === 'invalid_course_or_section') throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid course or section');

@@ -22,6 +22,13 @@ const finalResponder = catchAsync(async (req, res) => {
     resJson.status = 'error';
   }
 
+  // bump up `msg` if passed (and delete passOn.msg)
+  if (passOn.msg) {
+    resJson.msg = passOn.msg;
+    delete passOn.msg;
+  }
+
+  // finally, deep extend (to copy everything from passOn to resJson.payload
   resJson.payload = deepExtend(resJson.payload, passOn);
 
   // Check if access token was renewed silently. If so,
@@ -30,8 +37,8 @@ const finalResponder = catchAsync(async (req, res) => {
     resJson.payload.accessToken = getBearerTokenFromHeaders(req);
   }
 
-  if (resJson.error) res.statusCode(passOn.error.statusCode || 500).send(resJson);
-  else res.statusCode(200).send(resJson);
+  if (resJson.error) res.status(passOn.error.statusCode || 500).send(resJson);
+  else res.status(200).send(resJson);
 });
 
 module.exports = finalResponder;
