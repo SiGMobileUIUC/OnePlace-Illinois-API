@@ -12,6 +12,8 @@ const envVarsSchema = Joi.object()
     POSTGRES_USER: Joi.string().required().default('postgres'),
     POSTGRES_PASSWORD: Joi.string().required(),
     POSTGRES_DB: Joi.string().required().description('Database name to connect'),
+
+    COOKIE_SECRET: Joi.string().required().description('SHA512 for signing cookies'),
   })
   .unknown();
 
@@ -43,4 +45,6 @@ module.exports = {
   jwt: {
     issuer: 'https://oneplaceillinois.com',
   },
+
+  cookieSecret: envVars.COOKIE_SECRET,
 };
