@@ -5,7 +5,7 @@ const sectionRoute = require('./section.route');
 const libraryRoute = require('./library.route');
 const userRoute = require('./user.route');
 const feedRoute = require('./feed.route');
-const finalResponder = require('../../middlewares/final-responder');
+const finalResponder = require('../../middlewares/finalResponder');
 
 const router = express.Router();
 

@@ -1,7 +1,7 @@
 const { Sequelize } = require('sequelize');
 const pgconf = require('../config/config').postgres;
 
-const AuthJWT = require('./AuthJWT.model');
+const AuthJWT = require('./AuthJwt.model');
 const Courses = require('./Courses.model');
 const { FeedModel: Feed } = require('./Feed.model');
 const Library = require('./Library.model');

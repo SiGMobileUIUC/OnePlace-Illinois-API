@@ -5,8 +5,8 @@ const jwt = require('jsonwebtoken');
 
 const ApiError = require('../utils/ApiError');
 const { Users } = require('../models');
-const { verifyUserWithIDToken } = require('./internal/userAuth.service');
-const ServerJWT = require('./internal/serverJWT.service');
+const { verifyUserWithIDToken } = require('./internal/userAuth');
+const ServerJWT = require('./internal/serverJwt');
 
 const loginUser = async (options) => {
   try {

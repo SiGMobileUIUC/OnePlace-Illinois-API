@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 
 const ApiError = require('../utils/ApiError');
 const config = require('../config/config');
-const ServerJWT = require('../services/internal/serverJWT.service');
+const ServerJWT = require('../services/internal/serverJwt');
 
 const jwtAuthenticate = async (req, res, next) => {
   // First, check that refresh token exists in signed cookie.

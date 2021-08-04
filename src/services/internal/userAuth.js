@@ -2,7 +2,7 @@ const httpStatus = require('http-status');
 const admin = require('firebase-admin');
 
 const ApiError = require('../../utils/ApiError');
-const { verifyServerAccessJWT, verifyServerRefreshJWT } = require('./serverJWT.service');
+const { verifyServerAccessJWT, verifyServerRefreshJWT } = require('./serverJwt');
 
 const serviceAccount = require('../../../serviceAccountKey.json');
 

@@ -6,7 +6,7 @@ const config = require('./config');
 const ApiError = require('../utils/ApiError');
 const { getBearerTokenFromHeaders } = require('../utils/auth');
 const { Users } = require('../models');
-const ServerJWT = require('../services/internal/serverJWT.service');
+const ServerJWT = require('../services/internal/serverJwt');
 
 // TODO: check the performance of fetching signing key from DB for every request (use Redis if possible)
 async function getJwtSigningKey(token) {
