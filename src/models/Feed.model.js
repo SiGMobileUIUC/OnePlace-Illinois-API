@@ -1,9 +1,9 @@
 const { DataTypes } = require('sequelize');
 
 const FeedItemType = {
-  Homework: 'Homework',
-  Lecture: 'Lecture',
-  Section: 'Section',
+  Homework: 0,
+  Lecture: 1,
+  Section: 2,
 };
 
 const FeedActionType = {
@@ -34,7 +34,7 @@ module.exports.FeedModel = {
     allowNull: false,
   },
   type: {
-    type: DataTypes.ENUM(Object.keys(FeedItemType)),
+    type: DataTypes.INT,
     allowNull: false,
   },
   body: {
