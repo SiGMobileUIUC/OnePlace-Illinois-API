@@ -36,7 +36,7 @@ const deleteUser = catchAsync(async (req, res) => {
     throw new ApiError(httpStatus.NOT_FOUND, 'User does not exist or could not be deleted');
   }
 
-  res.send({ status: deleted });
+  res.send({ status: 'success', error: null, payload: {} });
 });
 
 module.exports = {

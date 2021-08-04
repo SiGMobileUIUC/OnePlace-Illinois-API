@@ -4,7 +4,7 @@ const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
 const { courseService } = require('../services');
 
-const search = catchAsync(async (req, res) => {
+const search = catchAsync(async (req, res, next) => {
   const options = pick(req.query, ['keyword', 'page', 'per_page', 'only_courses']);
   const courses = await courseService.searchCourses(options);
 
@@ -13,7 +13,8 @@ const search = catchAsync(async (req, res) => {
     throw new ApiError(httpStatus.NOT_FOUND, 'No matching course found');
   }
 
-  res.send({ courses });
+  res.locals = { courses };
+  next();
 });
 
 module.exports = {
