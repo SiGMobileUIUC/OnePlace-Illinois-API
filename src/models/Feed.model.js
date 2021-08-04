@@ -34,7 +34,7 @@ module.exports.FeedModel = {
     allowNull: false,
   },
   type: {
-    type: DataTypes.INT,
+    type: DataTypes.INTEGER,
     allowNull: false,
   },
   body: {
