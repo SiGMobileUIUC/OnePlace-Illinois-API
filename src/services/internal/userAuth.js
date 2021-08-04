@@ -2,7 +2,7 @@ const httpStatus = require('http-status');
 const admin = require('firebase-admin');
 
 const ApiError = require('../../utils/ApiError');
-const { verifyServerAccessJWT, verifyServerRefreshJWT } = require('./serverJWT.service');
+const { verifyServerAccessJWT, verifyServerRefreshJWT } = require('./serverJwt');
 
 const serviceAccount = require('../../../serviceAccountKey.json');
 
@@ -55,6 +55,7 @@ const verifyUserWithIDToken = async (email, token) => {
   } catch (e) {
     console.log(e);
     if (e instanceof ApiError) throw e;
+    if (e.codePrefix === 'auth') throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid Firebase ID token');
     throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Internal server error');
   }
 };

@@ -1,7 +1,7 @@
 const express = require('express');
 
-const { jwtAuthenticate } = require('../../config/passport');
 const validate = require('../../middlewares/validate');
+const jwtAuthenticate = require('../../middlewares/auth');
 const { libraryValidation } = require('../../validations');
 const { libraryController } = require('../../controllers');
 

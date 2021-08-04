@@ -1,4 +1,5 @@
 const express = require('express');
+
 const validate = require('../../middlewares/validate');
 const { sectionValidation } = require('../../validations');
 const { sectionController } = require('../../controllers');

@@ -5,8 +5,8 @@ const jwt = require('jsonwebtoken');
 
 const ApiError = require('../utils/ApiError');
 const { Users } = require('../models');
-const { verifyUserWithIDToken } = require('./internal/userAuth.service');
-const ServerJWT = require('./internal/serverJWT.service');
+const { verifyUserWithIDToken } = require('./internal/userAuth');
+const ServerJWT = require('./internal/serverJwt');
 
 const loginUser = async (options) => {
   try {
@@ -29,6 +29,7 @@ const loginUser = async (options) => {
     return { id: userRecord._id, email: userRecord.email, accessToken, refreshToken };
   } catch (e) {
     console.log(e);
+    if (e instanceof ApiError) throw e;
     throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Internal server error');
   }
 };

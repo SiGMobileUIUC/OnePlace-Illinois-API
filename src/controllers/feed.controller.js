@@ -4,7 +4,7 @@ const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
 const { feedService } = require('../services');
 
-const get = catchAsync(async (req, res) => {
+const get = catchAsync(async (req, res, next) => {
   const options = { email: req.headers.JWT_USER_EMAIL };
   const resJSON = await feedService.list(options);
 
@@ -13,7 +13,8 @@ const get = catchAsync(async (req, res) => {
     throw new ApiError(httpStatus.NOT_FOUND, 'No feed found for user');
   }
 
-  res.send(resJSON);
+  res.locals = resJSON;
+  next();
 });
 
 module.exports = {

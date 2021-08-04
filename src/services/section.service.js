@@ -2,7 +2,7 @@ const httpStatus = require('http-status');
 
 const ApiError = require('../utils/ApiError');
 const { Sections } = require('../models');
-const { isArray } = require('../utils');
+const { isArray } = require('../utils/helpers');
 
 const sectionAttributes = ['year', 'term', 'CRN', 'full_code', 'course', 'code', 'part_of_term', 'section_title', 'section_status', 'section_credit_hours', 'enrollment_status', 'type', 'type_code', 'start_time', 'end_time', 'days_of_week', 'room', 'building', 'instructors'];
 
@@ -63,6 +63,7 @@ const searchSections = async (options, internal = {}) => {
     return justOne ? Sections.findOne(dbOptions) : Sections.findAll(dbOptions);
   } catch (e) {
     console.log(e);
+    if (e instanceof ApiError) throw e;
     throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Internal server error');
   }
 };

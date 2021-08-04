@@ -5,6 +5,7 @@ const compression = require('compression');
 const cors = require('cors');
 const passport = require('passport');
 const httpStatus = require('http-status');
+const cookieParser = require('cookie-parser')
 
 const config = require('./config/config');
 const morgan = require('./config/morgan');
@@ -53,6 +54,9 @@ app.use(compression());
 // enable cors
 app.use(cors());
 app.options('*', cors());
+
+// use cookie helper
+app.use(cookieParser(config.cookieSecret));
 
 // JWT authentication
 app.use(passport.initialize());
