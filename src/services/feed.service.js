@@ -9,7 +9,7 @@ const list = async (options) => {
   try {
     const { email } = options;
     const records = await Feed.findAll({ where: { email }, include: Sections },);
-    console.log(records);
+
     if (!records) return { status: 'error', error: 'none-match', payload: null };
 
     return { status: 'success', error: null, payload: records };
