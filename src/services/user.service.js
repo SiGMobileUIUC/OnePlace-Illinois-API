@@ -29,6 +29,7 @@ const loginUser = async (options) => {
     return { id: userRecord._id, email: userRecord.email, accessToken, refreshToken };
   } catch (e) {
     console.log(e);
+    if (e instanceof ApiError) throw e;
     throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Internal server error');
   }
 };

@@ -63,6 +63,7 @@ const searchSections = async (options, internal = {}) => {
     return justOne ? Sections.findOne(dbOptions) : Sections.findAll(dbOptions);
   } catch (e) {
     console.log(e);
+    if (e instanceof ApiError) throw e;
     throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Internal server error');
   }
 };

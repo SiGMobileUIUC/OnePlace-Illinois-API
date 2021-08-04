@@ -160,7 +160,8 @@ class ServerJWT {
    * @returns {Promise<JWT>}
    */
   static async issueAccessToken(email, keyIdentifier = null) {
-    return ServerJWT._create(email, 'access', '1hr', keyIdentifier);
+    // return ServerJWT._create(email, 'access', '1hr', keyIdentifier);
+    return ServerJWT._create(email, 'access', 60, keyIdentifier); // 60s dummy access token
   }
 
   /**

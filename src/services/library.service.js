@@ -1,10 +1,11 @@
 const httpStatus = require('http-status');
 
 const ApiError = require('../utils/ApiError');
-const { Library, Courses, Sections, Feed } = require('../models');
+const {
+  Library, Courses, Sections, Feed
+} = require('../models');
 const { FeedItemType, FeedActionType } = require('../models/Feed.model');
 const FeedService = require('./feed.service');
-
 
 async function checkCourseAndSection(course, section) {
   const prelimError = new ApiError(httpStatus.BAD_REQUEST, '');
@@ -41,7 +42,9 @@ async function checkCourseAndSection(course, section) {
  */
 const search = async (options) => {
   try {
-    const { email, course, section, only_active: onlyActive } = options;
+    const {
+      email, course, section, only_active: onlyActive,
+    } = options;
 
     const dbOptions = { attributes: ['course', 'section', 'createdAt'], where: { email } };
 
@@ -57,6 +60,7 @@ const search = async (options) => {
     return await Library.findAll(dbOptions);
   } catch (e) {
     console.log(e);
+    if (e instanceof ApiError) throw e;
     throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Internal server error');
   }
 };
@@ -72,8 +76,10 @@ const add = async (options) => {
 
     await checkCourseAndSection(course, section);
 
-    const full_code = `${course}_${section}`;
-    const condition = { email, course, section, full_code, is_active: true };
+    const fullCode = `${course}_${section}`;
+    const condition = {
+      email, course, section, full_code: fullCode, is_active: true,
+    };
 
     const record = await Library.findOne({ where: condition });
     if (record) return { status: 'already-exists', error: null, payload: {} };
@@ -81,8 +87,9 @@ const add = async (options) => {
     const inserted = await Library.create(condition);
 
     await FeedService.create({
-      email, course, section,
-      postDate: new Date(),
+      email,
+      course,
+      section,
       action: FeedActionType.created.newSubscriber,
     });
 
@@ -91,6 +98,7 @@ const add = async (options) => {
   } catch (e) {
     console.log(e);
     if (e.name === 'invalid_course_or_section') throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid course or section');
+    if (e instanceof ApiError) throw e;
     throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Internal server error');
   }
 };
@@ -131,6 +139,7 @@ const drop = async (options) => {
   } catch (e) {
     console.log(e);
     if (e.name === 'invalid_course_or_section') throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid course or section');
+    if (e instanceof ApiError) throw e;
     throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Internal server error');
   }
 };
@@ -147,7 +156,9 @@ const activationSwitch = async (options, shouldActivate) => {
 
     await checkCourseAndSection(course, section);
 
-    const condition = { email, course, section, full_code: `${course}_${section}` };
+    const condition = {
+      email, course, section, full_code: `${course}_${section}`,
+    };
 
     const record = await Library.findOne({ where: condition });
     if (!record) throw new ApiError(httpStatus.BAD_REQUEST, 'No course-section available for user');
@@ -158,6 +169,7 @@ const activationSwitch = async (options, shouldActivate) => {
   } catch (e) {
     console.log(e);
     if (e.name === 'invalid_course_or_section') throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid course or section');
+    if (e instanceof ApiError) throw e;
     throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Internal server error');
   }
 };

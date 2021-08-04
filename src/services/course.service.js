@@ -134,6 +134,7 @@ const searchCourses = async (options) => {
     return courses;
   } catch (e) {
     console.log(e);
+    if (e instanceof ApiError) throw e;
     throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Internal server error');
   }
 };
@@ -183,6 +184,8 @@ const searchCoursesThroughWebsites = async (options) => {
 
     return courses;
   } catch (e) {
+    console.log(e);
+    if (e instanceof ApiError) throw e;
     throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Internal server error');
   }
 };

@@ -55,6 +55,7 @@ const verifyUserWithIDToken = async (email, token) => {
   } catch (e) {
     console.log(e);
     if (e instanceof ApiError) throw e;
+    if (e.codePrefix === 'auth') throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid Firebase ID token');
     throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Internal server error');
   }
 };
