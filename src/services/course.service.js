@@ -87,10 +87,7 @@ const searchCourses = async (options) => {
 
     for (const course of courses) {
       const courseFullCode = `${course.subject}${course.code}`;
-      const internalOptions = {
-        attributes: ['year', 'term', 'CRN', 'code', 'part_of_term', 'section_title', 'section_status', 'section_credit_hours', 'enrollment_status', 'type', 'type_code', 'start_time', 'end_time', 'days_of_week', 'room', 'building', 'instructors'],
-      };
-      tmpSections[courseFullCode] = await searchSections({ code: courseFullCode }, internalOptions);
+      tmpSections[courseFullCode] = await searchSections({ code: courseFullCode });
     }
 
     courses = courses.map((course) => {

@@ -39,7 +39,7 @@ const list = async (options) => {
 
     // TODO: return createdAt as postDate
 
-    return { status: 'success', error: null, payload: records };
+    return records;
   } catch (e) {
     console.log(e);
     if (e instanceof ApiError) throw e;

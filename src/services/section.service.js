@@ -59,7 +59,6 @@ const searchSections = async (options, internal = {}) => {
       where: dbCondition,
       order: [['year', 'desc']],
     };
-
     return justOne ? Sections.findOne(dbOptions) : Sections.findAll(dbOptions);
   } catch (e) {
     console.log(e);
