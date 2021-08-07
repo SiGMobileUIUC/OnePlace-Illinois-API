@@ -11,6 +11,12 @@ const list = {
   },
 };
 
+const trash = {
+  body: {
+    id: Joi.string().guid({ version: ['uuidv4'] }),
+  },
+};
+
 module.exports = {
-  list,
+  list, trash,
 };
