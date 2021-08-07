@@ -32,7 +32,7 @@ const section = [
 const feed = [
   'email',
   ['section_full_code', 'sectionFullCode'], // `section_full_code` AS `sectionFullCode`
-  'item_id',
+  ['item_id', 'itemId'], // `item_id` as `itemId`
   'type',
   'body',
   'action',
