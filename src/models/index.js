@@ -3,7 +3,7 @@ const pgconf = require('../config/config').postgres;
 
 const AuthJWT = require('./AuthJwt.model');
 const Courses = require('./Courses.model');
-const { FeedModel: Feed } = require('./Feed.model');
+const Feed = require('./Feed.model');
 const Library = require('./Library.model');
 const Sections = require('./Sections.model');
 const Subjects = require('./Subjects.model');
@@ -27,12 +27,16 @@ Object.keys(models).forEach((modelName) => {
 
 /*
     Define Table Relations
+    ** do both 'belongsTo' and 'hasMany' to strongly define the relationship
+    ** use Sequelize.col('Table.Column') for hasMany to avoid ambiguous relations (ie. tables have same-name cols)
  */
 // Foreign Key (FK) from Course.subject to Subjects.code
 models.Courses.belongsTo(models.Subjects, { foreignKey: 'subject', targetKey: 'code' });
+models.Subjects.hasMany(models.Courses, { foreignKey: 'code', targetKey: 'subject' });
 
 // FK from Sections.course to Course.full_code
 models.Sections.belongsTo(models.Courses, { foreignKey: 'course', targetKey: 'full_code' });
+models.Courses.hasMany(models.Sections, { foreignKey: 'course', targetKey: Sequelize.col('Courses.full_code') });
 
 // FK from Library.user_email to Users.email
 models.Library.belongsTo(models.Users, { foreignKey: 'email', targetKey: 'email' });

@@ -1,7 +1,9 @@
 const course = [
   'subject',
   'code',
+  // ['full_code', 'fullCode'],
   'name',
+  // 'full_code',
   'description',
   ['credit_hours', 'creditHours'],
   'degree_attributes', // keep this as is for genEd parsing
