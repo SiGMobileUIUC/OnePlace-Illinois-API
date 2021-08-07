@@ -20,6 +20,7 @@ const finalResponder = catchAsync(async (req, res, next) => {
     payload: {},
   };
 
+  // check for error
   if (passOn.error) {
     resJson.error = passOn.error;
     resJson.status = 'error';
@@ -34,8 +35,7 @@ const finalResponder = catchAsync(async (req, res, next) => {
   // finally, deep extend (to copy everything from passOn to resJson.payload
   resJson.payload = deepExtend(resJson.payload, passOn);
 
-  // Check if access token was renewed silently. If so,
-  // return it to the client.
+  // Check if access token was renewed silently. If so, return it to the client.
   if (req.headers.auth_renewed) {
     resJson.payload.accessToken = getBearerTokenFromHeaders(req);
   }

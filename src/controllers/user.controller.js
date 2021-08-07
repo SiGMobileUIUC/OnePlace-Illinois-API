@@ -7,7 +7,7 @@ const catchAsync = require('../utils/catchAsync');
 const { userService } = require('../services');
 
 // creates user if doesn't exist (as we already trust Firebase Auth)
-const loginUser = catchAsync(async (req, res) => {
+const loginUser = catchAsync(async (req, res, next) => {
   const options = pick(req.body, ['email', 'token']);
   const loginRes = await userService.loginUser(options);
 
@@ -25,10 +25,11 @@ const loginUser = catchAsync(async (req, res) => {
     signed: config.env !== 'development', // Indicates if the cookie should be signed.
   });
 
-  res.send({ status: 'success', error: null, payload: { id, email, accessToken } });
+  res.locals = { id, email, accessToken };
+  next();
 });
 
-const deleteUser = catchAsync(async (req, res) => {
+const deleteUser = catchAsync(async (req, res, next) => {
   const options = pick(req.body, ['email', 'token']);
   const deleted = await userService.deleteUser(options);
 
@@ -36,7 +37,8 @@ const deleteUser = catchAsync(async (req, res) => {
     throw new ApiError(httpStatus.NOT_FOUND, 'User does not exist or could not be deleted');
   }
 
-  res.send({ status: 'success', error: null, payload: {} });
+  res.locals = {};
+  next();
 });
 
 module.exports = {
