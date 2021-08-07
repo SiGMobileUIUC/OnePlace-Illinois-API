@@ -9,6 +9,8 @@ const ApiError = require('./ApiError');
 // ** express makes everything lowercase (authorization, but NOT Bearer)
 const getBearerTokenFromHeaders = (req) => {
   const authHeader = req.headers.authorization;
+
+  if (!authHeader) throw new ApiError(httpStatus.BAD_REQUEST, 'Missing authorization header');
   if (!authHeader.startsWith('Bearer ')) throw new ApiError(httpStatus.BAD_REQUEST, 'Missing bearer token');
 
   const jwtToken = authHeader.substring(7, authHeader.length);

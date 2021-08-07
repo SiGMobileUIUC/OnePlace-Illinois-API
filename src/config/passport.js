@@ -54,7 +54,10 @@ const jwtStrategyFunction = async (req, done) => {
       e instanceof ApiError || e instanceof jwt.JsonWebTokenError
       || e instanceof jwt.NotBeforeError || e instanceof jwt.TokenExpiredError) {
       done(e, null, null);
-    } else done(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Internal server error'), null, null);
+    } else {
+      console.log(e);
+      done(new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Internal server error'), null, null);
+    }
   }
 };
 
