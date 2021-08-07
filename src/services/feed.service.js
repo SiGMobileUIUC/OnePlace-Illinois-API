@@ -1,12 +1,14 @@
 const httpStatus = require('http-status');
+const { Op } = require('sequelize');
 
 const ApiError = require('../utils/ApiError');
 const { Feed, Sections } = require('../models');
 const { FeedItemType, FeedActionType } = require('../models/Feed.model');
+const itemAttributes = require('./internal/itemAttributes');
 
 function getFeedDataFromOptions(options) {
   const {
-    email, course, section, action, attachmentUrl
+    email, course, section, action, attachmentUrl,
   } = options;
   const fullCode = `${course}_${section}`;
   let type;
@@ -32,14 +34,62 @@ function getFeedDataFromOptions(options) {
 
 const list = async (options) => {
   try {
-    const { email } = options;
-    const records = await Feed.findAll({ where: { email }, include: Sections });
+    const {
+      email, course, section, page, per_page: perPage, only_feeds: onlyFeeds,
+    } = options;
 
-    if (!records) return { status: 'error', error: 'none-match', payload: null };
+    const queryConds = { email };
+    const includeTables = [];
 
-    // TODO: return createdAt as postDate
+    /*
+        QS: Course & Section (narrow down feed list search)
+     */
+    // if: qs `course` is provided
+    // else if: qs `section` is provided AND NOT qs `course`
+    if (course) {
+      // if: qs `section` is also provided
+      // else: only qs `course` is provided, use STARTS_WITH sql (equivalent in Sequelize)
+      if (section) {
+        // TODO: Check if escaping here is redundant
+        // NOTE: No need for escaping input since Sequelize v4+ auto escapes
+        queryConds.section_full_code = `${course}_${section}`;
+      } else {
+        queryConds.section_full_code = { [Op.iLike]: `${course}%` }; // 'xyz%' is prefix xyz
+      }
+    } else if (section) {
+      // use ENDS_WITH sql
+      queryConds.section_full_code = { [Op.iLike]: `%${section}` }; // '%xyz' is suffix xyz
+    }
 
-    return { status: 'success', error: null, payload: records };
+    /*
+        Get detailed section data for each feed in the feed list
+     */
+    if (!onlyFeeds) {
+      // join on Feeds.section_full_code == Sections.full_code
+      includeTables.push({
+        model: Sections,
+        required: true,
+        attributes: itemAttributes.section,
+      });
+    }
+
+    const dbOptions = {
+      where: queryConds,
+      attributes: itemAttributes.feed,
+      include: includeTables,
+      limit: Math.max(10, perPage), // min perPage is 10
+      offset: Math.max(0, perPage * (page - 1)), // page starts at 1
+      order: [['createdAt', 'desc']],
+    };
+
+    const feedItems = await Feed.findAll(dbOptions);
+
+    // modify the key 'Section' (from JOIN) to 'sectionDetail'
+    feedItems.forEach((feedItem) => {
+      delete Object.assign(feedItem.dataValues, { ['sectionDetail']: feedItem.dataValues.Section }).Section;
+    });
+
+    return feedItems;
   } catch (e) {
     console.log(e);
     if (e instanceof ApiError) throw e;

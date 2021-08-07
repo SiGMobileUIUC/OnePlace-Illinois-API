@@ -1,19 +1,15 @@
-const httpStatus = require('http-status');
-
-const ApiError = require('../utils/ApiError');
+const pick = require('../utils/pick');
 const catchAsync = require('../utils/catchAsync');
 const { feedService } = require('../services');
 
 const get = catchAsync(async (req, res, next) => {
-  const options = { email: req.headers.JWT_USER_EMAIL };
-  const resJSON = await feedService.list(options);
+  const options = pick(req.query, ['course', 'section', 'page', 'per_page', 'only_feeds']);
+  options.email = req.headers.JWT_USER_EMAIL;
+  const records = await feedService.list(options);
 
-  // TODO: change response on no resJSON
-  if (!resJSON) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'No feed found for user');
-  }
+  res.locals = { feed: records || [] };
+  if (records.length === 0) res.locals.msg = 'No feed records for the user';
 
-  res.locals = resJSON;
   next();
 });
 
