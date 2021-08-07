@@ -1,18 +1,6 @@
 const { DataTypes } = require('sequelize');
 
-const FeedItemType = {
-  Homework: 0,
-  Lecture: 1,
-  Section: 2,
-};
-
-const FeedActionType = {
-  created: {
-    newSubscriber: 'created__new_subscriber',
-  },
-};
-
-module.exports.FeedModel = {
+module.exports = {
   _id: {
     type: DataTypes.UUID,
     defaultValue: DataTypes.UUIDV4,
@@ -52,7 +40,8 @@ module.exports.FeedModel = {
       isUrl: true,
     },
   },
+  // in_trash: {
+  //   type: DataTypes.BOOL,
+  //   allowNull: false,
+  // },
 };
-
-module.exports.FeedItemType = FeedItemType;
-module.exports.FeedActionType = FeedActionType;
