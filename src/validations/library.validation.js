@@ -21,7 +21,8 @@ const drop = {
     course: Joi.string().required(),
     // if section is not provided,
     // the given course & all its sections are dropped
-    section: Joi.number().optional(), // CRN
+    // NOTE: for now, user must provide both course & section
+    section: Joi.number().required(), // CRN
   },
 };
 
