@@ -32,7 +32,7 @@ Object.keys(models).forEach((modelName) => {
  */
 // Foreign Key (FK) from Course.subject to Subjects.code
 models.Courses.belongsTo(models.Subjects, { foreignKey: 'subject', targetKey: 'code' });
-models.Subjects.hasMany(models.Courses, { foreignKey: 'code', targetKey: 'subject' });
+models.Subjects.hasMany(models.Courses, { foreignKey: 'subject', targetKey: Sequelize.col('Subjects.code') });
 
 // FK from Sections.course to Course.full_code
 models.Sections.belongsTo(models.Courses, { foreignKey: 'course', targetKey: 'full_code' });
