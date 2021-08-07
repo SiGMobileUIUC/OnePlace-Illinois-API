@@ -1,11 +1,8 @@
-const axios = require('axios');
-const cheerio = require('cheerio');
 const httpStatus = require('http-status');
 const { Op, literal } = require('sequelize');
 
 const ApiError = require('../utils/ApiError');
 const { Courses, Sections } = require('../models');
-const { searchSections } = require('./section.service');
 const itemAttributes = require('./internal/itemAttributes');
 const subjectCodeToName = require('../../data/2021-subjects.json');
 
@@ -89,11 +86,11 @@ const searchCourses = async (options) => {
     if (onlyCourses) dbOptions.include[0].limit = 1;
 
     // Get course data
-    const courses = await Courses.findAll(dbOptions);
+    const courses = (await Courses.findAll(dbOptions)).map((x) => x.get({ plain: true })); // gets pure array
 
     // Refine course data & return
     return courses.map((_course) => {
-      const course = _course.toJSON();
+      const course = _course;
       const sections = course.Sections;
 
       // Year & Term - retrieved from the first section data
@@ -127,55 +124,6 @@ const searchCourses = async (options) => {
 
       return course;
     });
-  } catch (e) {
-    console.log(e);
-    if (e instanceof ApiError) throw e;
-    throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Internal server error');
-  }
-};
-
-/**
- * Fetch courses from Illinois website using our own options
- * @param {object} options
- * @returns {Promise>}
- */
-const searchCoursesThroughWebsites = async (options) => {
-  try {
-    const keyword = options.keyword.toLowerCase();
-    const { term, year } = options;
-
-    const url = `https://courses.illinois.edu/search?keyword=${keyword}&term=${term}&year=${year}&length=10`;
-    const relayedRes = await axios.get(url);
-    const $ = cheerio.load(relayedRes.data);
-
-    const $resultRows = $('#search-result-dt > tbody > tr');
-    const years = [];
-    const terms = [];
-    const subjects = [];
-    const numbers = [];
-    const names = [];
-
-    $resultRows.each((i, row) => {
-      const cols = $(row).children('td');
-      const courseFullCode = $(cols[3]).html().split(' '); // e.g. 'STAT 200' => ['STAT', '200']
-      // for courseName, remove tab \t, newline \n, and \r, and then trim whitespace
-      const courseName = $(cols[4]).find('a').text().replace(/[\t\n\r]/gm,'').trim();
-      years.push($(cols[1]).html());
-      terms.push($(cols[2]).html());
-      names.push(courseName);
-      subjects.push(courseFullCode[0]);
-      numbers.push(courseFullCode[1]);
-    });
-
-    const courses = years.map((yr, i) => ({
-      year: yr,
-      term: terms[i],
-      subjectId: subjects[i],
-      subjectNumber: numbers[i],
-      name: names[i],
-    }));
-
-    return courses;
   } catch (e) {
     console.log(e);
     if (e instanceof ApiError) throw e;

@@ -1,7 +1,6 @@
 const httpStatus = require('http-status');
 const { literal } = require('sequelize');
 const { addDays } = require('date-fns');
-const jwt = require('jsonwebtoken');
 
 const ApiError = require('../utils/ApiError');
 const { Users } = require('../models');
@@ -19,14 +18,16 @@ const loginUser = async (options) => {
     const res = await Users.upsert({
       email, uid, last_login: lastLogin, login_expiration: loginExpiration,
     });
-    const userRecord = res[0].dataValues;
 
+    const userRecord = res[0].toJSON();
     if (!userRecord._id) throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Internal server error');
 
     const accessToken = await ServerJWT.issueAccessToken(email);
     const refreshToken = await ServerJWT.issueRefreshToken(email);
 
-    return { id: userRecord._id, email: userRecord.email, accessToken, refreshToken };
+    return {
+      id: userRecord._id, email: userRecord.email, accessToken, refreshToken,
+    };
   } catch (e) {
     console.log(e);
     if (e instanceof ApiError) throw e;
@@ -40,7 +41,7 @@ const deleteUser = async (options) => {
 
     // TODO: verify user access with token before deleting
 
-    const decodedIDToken = verifyUserWithIDToken(email, token);
+    await verifyUserWithIDToken(email, token);
 
     return await Users.destroy({ where: { email } });
   } catch (e) {

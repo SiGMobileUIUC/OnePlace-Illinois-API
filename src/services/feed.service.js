@@ -3,7 +3,7 @@ const { Op } = require('sequelize');
 
 const ApiError = require('../utils/ApiError');
 const { Feed, Sections } = require('../models');
-const { FeedItemType, FeedActionType } = require('../models/Feed.model');
+const { FeedItemType, FeedActionType } = require('../types/feed');
 const itemAttributes = require('./internal/itemAttributes');
 
 function getFeedDataFromOptions(options) {
@@ -15,7 +15,7 @@ function getFeedDataFromOptions(options) {
   let body;
   let itemId;
 
-  if (action === FeedActionType.created.newSubscriber) {
+  if (action === FeedActionType.created.sectionSubscriber) {
     type = FeedItemType.Section;
     body = `You subscribed to the section ${fullCode}`;
     itemId = fullCode;
@@ -29,6 +29,7 @@ function getFeedDataFromOptions(options) {
     body,
     action,
     attachment_url: attachmentUrl,
+    in_trash: false,
   };
 }
 
@@ -39,7 +40,6 @@ const list = async (options) => {
     } = options;
 
     const queryConds = { email };
-    const includeTables = [];
 
     /*
         QS: Course & Section (narrow down feed list search)
@@ -64,29 +64,28 @@ const list = async (options) => {
     /*
         Get detailed section data for each feed in the feed list
      */
-    if (!onlyFeeds) {
-      // join on Feeds.section_full_code == Sections.full_code
-      includeTables.push({
-        model: Sections,
-        required: true,
-        attributes: itemAttributes.section,
-      });
-    }
-
     const dbOptions = {
       where: queryConds,
       attributes: itemAttributes.feed,
-      include: includeTables,
       limit: Math.max(10, perPage), // min perPage is 10
       offset: Math.max(0, perPage * (page - 1)), // page starts at 1
       order: [['createdAt', 'desc']],
     };
 
-    const feedItems = await Feed.findAll(dbOptions);
+    if (!onlyFeeds) {
+      // join on Feeds.section_full_code == Sections.full_code
+      dbOptions.include = [{
+        model: Sections,
+        required: true,
+        attributes: itemAttributes.section,
+      }];
+    }
+
+    const feedItems = (await Feed.findAll(dbOptions)).map((x) => x.get({ plain: true }));
 
     // modify the key 'Section' (from JOIN) to 'sectionDetail'
     feedItems.forEach((feedItem) => {
-      delete Object.assign(feedItem.dataValues, { ['sectionDetail']: feedItem.dataValues.Section }).Section;
+      delete Object.assign(feedItem, { sectionDetail: feedItem.Section }).Section;
     });
 
     return feedItems;
@@ -108,6 +107,30 @@ const create = async (options) => {
   }
 };
 
+const trash = async (options) => {
+  try {
+    const { id } = options;
+
+    const record = await Feed.findOne({ where: { id } });
+    if (!record) {
+      return {
+        status: 'success',
+        error: null,
+        msg: 'Specified feed record not found for the user',
+        payload: {},
+      };
+    }
+
+    await record.update({ in_trash: true });
+
+    return { status: 'success', error: null, payload: {} };
+  } catch (e) {
+    console.log(e);
+    if (e instanceof ApiError) throw e;
+    throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Internal server error');
+  }
+};
+
 module.exports = {
-  list, create,
+  list, create, trash,
 };

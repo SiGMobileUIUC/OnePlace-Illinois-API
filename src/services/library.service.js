@@ -1,10 +1,8 @@
 const httpStatus = require('http-status');
 
 const ApiError = require('../utils/ApiError');
-const {
-  Library, Courses, Sections, Feed
-} = require('../models');
-const { FeedItemType, FeedActionType } = require('../models/Feed.model');
+const { Library, Courses, Sections } = require('../models');
+const { FeedActionType } = require('../types/feed');
 const FeedService = require('./feed.service');
 
 async function checkCourseAndSection(course, section) {
@@ -166,7 +164,7 @@ const activationSwitch = async (options, shouldActivate) => {
     const record = await Library.findOne({ where: condition });
     if (!record) throw new ApiError(httpStatus.BAD_REQUEST, 'No course-section available for user');
 
-    const switchRes = await record.update({ is_active: shouldActivate });
+    await record.update({ is_active: shouldActivate });
 
     return { status: 'success', error: null, payload: {} };
   } catch (e) {
