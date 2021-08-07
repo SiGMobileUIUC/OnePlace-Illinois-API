@@ -60,7 +60,7 @@ const searchSections = async (options, internal = {}) => {
       order: [['year', 'desc']],
     };
 
-    return justOne ? Sections.findOne(dbOptions) : Sections.findAll(dbOptions);
+    return justOne ? await Sections.findOne(dbOptions) : await Sections.findAll(dbOptions);
   } catch (e) {
     console.log(e);
     if (e instanceof ApiError) throw e;

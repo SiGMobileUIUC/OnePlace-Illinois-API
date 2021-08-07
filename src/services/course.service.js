@@ -6,6 +6,7 @@ const { Op, literal } = require('sequelize');
 const ApiError = require('../utils/ApiError');
 const { Courses } = require('../models');
 const { searchSections } = require('./section.service');
+const itemAttributes = require('./internal/itemAttributes');
 const subjectCodeToName = require('../../data/2021-subjects.json');
 
 const isUpperCase = (str) => str === str.toUpperCase();
@@ -67,7 +68,7 @@ const searchCourses = async (options) => {
     ].filter((x) => x.length > 0);
 
     const dbOptions = {
-      attributes: ['subject', 'code', 'name', 'description', 'credit_hours', 'degree_attributes', 'schedule_info', 'section_info'],
+      attributes: itemAttributes.course,
       where: { [Op.or]: orQueries },
       order: resultOrder,
       limit: Math.max(10, perPage),
@@ -87,45 +88,43 @@ const searchCourses = async (options) => {
 
     for (const course of courses) {
       const courseFullCode = `${course.subject}${course.code}`;
-      const internalOptions = {
-        attributes: ['year', 'term', 'CRN', 'code', 'part_of_term', 'section_title', 'section_status', 'section_credit_hours', 'enrollment_status', 'type', 'type_code', 'start_time', 'end_time', 'days_of_week', 'room', 'building', 'instructors'],
-      };
+      const internalOptions = { attributes: itemAttributes.section };
+      // eslint-disable-next-line no-await-in-loop
       tmpSections[courseFullCode] = await searchSections({ code: courseFullCode }, internalOptions);
     }
 
-    courses = courses.map((course) => {
+    courses = courses.map((_course) => {
+      const course = _course;
       const courseFullCode = `${course.subject}${course.code}`;
       const sections = tmpSections[courseFullCode];
 
-      // const sectionLinks = sections.map((section) => `/api/v1/section/search?code=${courseFullCode}&CRN=${section.CRN}`);
-      const sectionLinks = sections.map((section) => `${section.code}_${section.CRN}`);
+      const sectionCodeList = sections.map((section) => `${section.code}_${section.CRN}`);
       const { year, term } = sections[0].dataValues; // get from the first section
       const termID = ['fall', 'spring', 'summer'].indexOf(term);
       // courses with multiple Gen Eds (e.g. ANTH 103 or GEOG 101) are separated with ", and" in the csv
       // so remove "and", split by "," and remove "course."
       const genEds = course.degree_attributes.replace(/\sand\s/, ' ').split(',').map((genEd) => genEd.replace(/\scourse.$/, '')).filter((x) => x);
 
-      return {
-        year,
-        semester: term,
-        semesterID: termID,
-        subject: subjectCodeToName[course.subject] || '',
-        subjectId: course.subject,
-        courseId: course.code,
-        name: course.name,
-        description: course.description,
-        creditHours: course.credit_hours,
-        courseSectionInformation: course.section_info,
-        classScheduleInformation: course.schedule_info,
-        genEd: genEds,
-        sections: sectionLinks,
-      };
+      // modify course data
+      course.year = year;
+      course.semester = term;
+      course.semesterID = termID;
+      course.subjectId = course.subject; // this comes before course.subject
+      course.subject = subjectCodeToName[course.subjectId] || '';
+      course.genEd = genEds;
+      course.sections = sectionCodeList;
+
+      delete course.code;
+      delete course.degree_attributes;
+
+      return course;
     });
 
     // return only course data
     if ((typeof onlyCourses === 'boolean' && onlyCourses) || onlyCourses === 'true') return courses;
 
-    courses = courses.map((course) => {
+    courses = courses.map((_course) => {
+      const course = _course;
       const courseFullCode = `${course.subjectId}${course.courseId}`;
       course.sections = tmpSections[courseFullCode];
       return course;

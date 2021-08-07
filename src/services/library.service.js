@@ -19,7 +19,7 @@ async function checkCourseAndSection(course, section) {
   }
 
   // Check that section exists
-  const sectionExists = await Sections.findOne({ where: { full_code: `${course}_${section}` } }); // e.g. CS124_77401
+  const sectionExists = await Sections.findOne({ where: { full_code: `${course}_${section}` } }); // e.g. CS124_74477
   if (!sectionExists) {
     prelimError.message = 'Section requested not found';
     throw prelimError;
@@ -51,11 +51,10 @@ const search = async (options) => {
     if (course) dbOptions.where.course = course;
     if (section) dbOptions.where.section = section;
 
-    if (onlyActive) { // if onlyActive == true
-      dbOptions.where.is_active = onlyActive;
-    } else {
-      dbOptions.attributes.push('is_active');
-    }
+    // if: onlyActive is true, then: find records with is_active === true
+    // else: get all active & inactive sections and show the is_active flag
+    if (onlyActive) dbOptions.where.is_active = onlyActive;
+    else dbOptions.attributes.push('is_active');
 
     return await Library.findAll(dbOptions);
   } catch (e) {
@@ -68,7 +67,7 @@ const search = async (options) => {
 /**
  * Add a section to user's library
  * @param {object} options { email, course, section }, email is parsed from JWT
- * @returns {Promise<{payload: {count: *}, error: null, status: string}|{payload: {}, error: null, status: string}>}
+ * @returns {Promise<*>}
  */
 const add = async (options) => {
   try {
@@ -82,7 +81,7 @@ const add = async (options) => {
     };
 
     const record = await Library.findOne({ where: condition });
-    if (record) return { msg: "already-exists" };
+    if (record) return { msg: 'already-exists' };
 
     const inserted = await Library.create(condition);
 
@@ -114,23 +113,27 @@ const drop = async (options) => {
 
     await checkCourseAndSection(course, section);
 
-    // allow user to drop the whole course (and all of its sections) if only course is provided
-    const dbOptions = { where: { email, course } };
-    if (section) dbOptions.where.section = section;
+    // X: allow user to drop the whole course (and all of its sections) if only course is provided
+    // For now, user must provide both course & section
+    const dbOptions = { where: { email, course, section } };
 
     const dropCount = await Library.destroy(dbOptions);
 
     if (dropCount > 0) {
-      // at least one course-section was successfully deleted
+      /*
+          At least one course-section was successfully deleted,
+          so create 'deleted' Feed
+       */
+      //
 
-      const feedQuery = {
-        email,
-        section_full_code: `${course}_${section}`,
-        type: FeedItemType.Section,
-        action: FeedActionType.created.newSubscriber,
-      };
-
-      await Feed.destroy({ where: feedQuery });
+      // const feedQuery = {
+      //   email,
+      //   section_full_code: `${course}_${section}`,
+      //   type: FeedItemType.Section,
+      //   action: FeedActionType.deleted.sectionSubscriber,
+      // };
+      //
+      // await Feed.destroy({ where: feedQuery });
 
       return { count: dropCount };
     }
