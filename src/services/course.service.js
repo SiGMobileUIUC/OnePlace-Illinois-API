@@ -107,11 +107,12 @@ const searchCourses = async (options) => {
       // Modify course data
       course.year = year;
       course.semester = term;
-      course.semesterID = termID;
+      course.semesterId = termID;
       course.subjectId = course.subject; // this comes before course.subject
       course.subject = subjectCodeToName[course.subjectId] || '';
+      course.courseId = course.code;
       course.genEd = genEds;
-      course.fullCode = course.full_code;
+      course.fullCode = course.full_code; // same as `${subject}${course}`
 
       // if: only_courses == false, then: copy section to a renamed key (for storing)
       // else: will discard the section data
