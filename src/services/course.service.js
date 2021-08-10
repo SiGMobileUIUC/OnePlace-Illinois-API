@@ -95,7 +95,6 @@ const searchCourses = async (options) => {
 
       // Year & Term - retrieved from the first section data
       const { year, term } = sections[0];
-      const termID = ['fall', 'spring', 'summer'].indexOf(term);
 
       // Gen Eds (ie. degree attributes)
       // - courses with multiple Gen Eds (e.g. ANTH 103 or GEOG 101) are separated with ", and" in the csv
@@ -107,7 +106,6 @@ const searchCourses = async (options) => {
       // Modify course data
       course.year = year;
       course.semester = term;
-      course.semesterId = termID;
       course.subjectId = course.subject; // this comes before course.subject
       course.subject = subjectCodeToName[course.subjectId] || '';
       course.courseId = course.code;

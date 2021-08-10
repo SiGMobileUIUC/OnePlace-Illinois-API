@@ -16,6 +16,7 @@ const section = [
   'term',
   'CRN',
   'code',
+  'course',
   ['part_of_term', 'partOfTerm'],
   ['section_title', 'sectionTitle'],
   ['section_status', 'sectionStatus'],
