@@ -7,7 +7,7 @@ const itemAttributes = require('./internal/itemAttributes');
 
 const searchOne = async (options, internal = {}) => {
   try {
-    const { code, CRN } = options;
+    const { CRN } = options;
     let { attributes } = internal;
 
     if (!isArray(attributes) || !attributes.length) attributes = itemAttributes.section;
@@ -16,8 +16,7 @@ const searchOne = async (options, internal = {}) => {
     // const codeDigits = code.replace(/[a-zA-Z]/g, '');
     // const courseCode = `${codeLetters}${codeDigits}`;
 
-    const dbCondition = { course: code };
-    if (typeof CRN === 'number') dbCondition.CRN = CRN;
+    const dbCondition = { CRN };
 
     const dbOptions = {
       attributes,
