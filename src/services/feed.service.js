@@ -50,7 +50,7 @@ const list = async (options) => {
       email, course, section, page, per_page: perPage, only_feeds: onlyFeeds,
     } = options;
 
-    const queryConds = { email };
+    const queryConds = { email, inTrash: false };
 
     /*
         QS: Course & Section (narrow down feed list search)
