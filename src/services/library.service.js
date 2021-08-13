@@ -87,7 +87,7 @@ const add = async (options) => {
       email,
       course,
       section,
-      action: FeedActionType.created.newSubscriber,
+      action: FeedActionType.created.sectionSubscriber,
     });
 
     // TODO: cleanup unnecessary part of the data returned
