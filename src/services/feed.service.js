@@ -1,10 +1,12 @@
 const httpStatus = require('http-status');
 const { Op } = require('sequelize');
 
-const ApiError = require('../utils/ApiError');
 const { Feed, Sections } = require('../models');
 const { FeedItemType, FeedActionType } = require('../types/feed');
+const ApiError = require('../utils/ApiError');
+
 const itemAttributes = require('./internal/itemAttributes');
+const SectionService = require('./section.service');
 
 function getFeedDataFromOptions(options) {
   const {
@@ -14,10 +16,16 @@ function getFeedDataFromOptions(options) {
   let type;
   let body;
   let itemId;
+  let sectionTitle = section;
+
+  const sectionData = SectionService.searchOne({ CRN: section });
+  if (sectionData) {
+    sectionTitle = sectionData.section_title;
+  }
 
   if (action === FeedActionType.created.sectionSubscriber) {
     type = FeedItemType.Section;
-    body = `You subscribed to the section ${fullCode}`;
+    body = `You subscribed to the section ${sectionTitle} of ${fullCode}`;
     itemId = fullCode;
   }
 
