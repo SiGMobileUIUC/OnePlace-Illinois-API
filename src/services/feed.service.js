@@ -84,19 +84,13 @@ const list = async (options) => {
       // join on Feeds.section_full_code == Sections.full_code
       dbOptions.include = [{
         model: Sections,
+        as: 'sectionData',
         required: true,
         attributes: itemAttributes.section,
       }];
     }
 
-    const feedItems = (await Feed.findAll(dbOptions)).map((x) => x.get({ plain: true }));
-
-    // modify the key 'Section' (from JOIN) to 'sectionDetail'
-    feedItems.forEach((feedItem) => {
-      delete Object.assign(feedItem, { sectionDetail: feedItem.Section }).Section;
-    });
-
-    return feedItems;
+    return (await Feed.findAll(dbOptions)).map((x) => x.get({ plain: true }));
   } catch (e) {
     console.log(e);
     if (e instanceof ApiError) throw e;
