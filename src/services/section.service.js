@@ -33,18 +33,20 @@ const searchOne = async (options, internal = {}) => {
  * @param {object} internal Used to deliver more options for internal calls (from other functions)
  * @returns {Promise<*|*>}
  */
- const searchSections = async (options, internal = {}) => {
+const searchSections = async (options, internal = {}) => {
   try {
-    const { code } = options;
+    const { course, section } = options;
     let { attributes } = internal;
 
     if (!isArray(attributes) || !attributes.length) attributes = itemAttributes.section;
 
-    // const codeLetters = code.replace(/[0-9]/g, '');
-    // const codeDigits = code.replace(/[a-zA-Z]/g, '');
-    // const courseCode = `${codeLetters}_${codeDigits}`;
+    const dbCondition = {};
 
-    const dbCondition = { course: code };
+    // Allow User to supply one or both (none will be invalidated by Joi beforehand)
+    // Course = ALL sections of that course
+    // Section OR (Course + Section) = ONE section
+    if (course) dbCondition.course = course;
+    if (section) dbCondition.CRN = section;
 
     const dbOptions = {
       attributes,

@@ -1,13 +1,11 @@
 const Joi = require('joi');
 
 const search = {
-  // search is GET, so use query
-  query: {
-    // code: Joi.string().required(), // e.g. CS124
-    CRN: Joi.number().optional(), // e.g. 74477
-    // term: Joi.string().allow('fall', 'spring', 'summer').default('fall'),
-    // year: Joi.number().integer().min(2000).max(new Date().getFullYear()).empty(['', null]).default(new Date().getFullYear()),
-  },
+  // require one of two fields be non-empty
+  query: Joi.object().keys({
+    course: Joi.string(), // e.g. CS124
+    section: Joi.number(), // CRN, e.g. 74477
+  }).or('course', 'section'),
 };
 
 module.exports = {
