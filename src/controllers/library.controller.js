@@ -6,7 +6,7 @@ const catchAsync = require('../utils/catchAsync');
 const { libraryService } = require('../services');
 
 const search = catchAsync(async (req, res, next) => {
-  const options = pick(req.query, ['course', 'section', 'only_active']);
+  const options = pick(req.query, ['course', 'section', 'only_active', 'shallow_search']);
   options.email = req.headers.JWT_USER_EMAIL;
   const library = await libraryService.search(options);
 

@@ -43,6 +43,13 @@ const feed = [
   ['createdAt', 'postDate'], // `createdAt` AS `postDate`
 ];
 
+const library = [
+  'course',
+  'section',
+  'createdAt',
+  ['is_active', 'isActive'],
+];
+
 module.exports = {
-  course, section, feed,
+  course, section, feed, library,
 };

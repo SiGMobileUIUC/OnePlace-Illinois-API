@@ -4,6 +4,7 @@ const ApiError = require('../utils/ApiError');
 const { Library, Courses, Sections } = require('../models');
 const { FeedActionType } = require('../types/feed');
 const FeedService = require('./feed.service');
+const itemAttributes = require('./internal/itemAttributes');
 
 async function checkCourseAndSection(course, section) {
   const prelimError = new ApiError(httpStatus.BAD_REQUEST, '');
@@ -40,19 +41,31 @@ async function checkCourseAndSection(course, section) {
  */
 const search = async (options) => {
   try {
+    // TODO: Add pagination options since Library list can get long
     const {
-      email, course, section, only_active: onlyActive,
+      email, course, section, only_active: onlyActive, shallow_search: shallowSearch,
     } = options;
 
-    const dbOptions = { attributes: ['course', 'section', 'createdAt'], where: { email } };
+    const dbOptions = {
+      attributes: itemAttributes.library,
+      where: { email },
+    };
 
     if (course) dbOptions.where.course = course;
     if (section) dbOptions.where.section = section;
+    if (!shallowSearch) {
+      // also grab section data related to each library item
+      dbOptions.include = [{
+        model: Sections,
+        as: 'sectionData',
+        required: true,
+        attributes: itemAttributes.section,
+      }];
+    }
 
     // if: onlyActive is true, then: find records with is_active === true
-    // else: get all active & inactive sections and show the is_active flag
+    // else: get all active & inactive sections
     if (onlyActive) dbOptions.where.is_active = onlyActive;
-    else dbOptions.attributes.push('is_active');
 
     return await Library.findAll(dbOptions);
   } catch (e) {

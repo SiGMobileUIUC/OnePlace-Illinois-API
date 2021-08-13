@@ -4,7 +4,8 @@ const search = {
   query: {
     course: Joi.string().optional(),
     section: Joi.number().optional(), // CRN
-    only_active: Joi.boolean().optional().default(false), // get only active sections for user
+    only_active: Joi.boolean().optional().default(false), // DEFAULT: get only active sections for user
+    shallow_search: Joi.boolean().optional().default(false), // DEFAULT: get section data related to library items
   },
 };
 

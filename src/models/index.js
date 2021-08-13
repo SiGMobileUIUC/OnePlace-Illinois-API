@@ -39,11 +39,11 @@ models.Sections.belongsTo(models.Courses, { foreignKey: 'course', targetKey: 'fu
 models.Courses.hasMany(models.Sections, { foreignKey: 'course', targetKey: Sequelize.col('Courses.full_code') });
 
 // FK from Library.user_email to Users.email
-models.Library.belongsTo(models.Users, { foreignKey: 'email', targetKey: 'email' });
+models.Library.belongsTo(models.Users, { as: 'userData', foreignKey: 'email', targetKey: 'email' });
 // FK from Library.course to Course.full_code (Subject+Course)
-models.Library.belongsTo(models.Courses, { foreignKey: 'course', targetKey: 'full_code' });
-// FK from Library.section to Section.full_code (Subject+Course+_+CRN)
-models.Library.belongsTo(models.Sections, { foreignKey: 'full_code', targetKey: 'full_code' });
+models.Library.belongsTo(models.Courses, { as: 'courseData', foreignKey: 'course', targetKey: 'full_code' });
+// FK from Library.section to Section.full_code (`Subject`+`Course`+`_`+`CRN`)
+models.Library.belongsTo(models.Sections, { as: 'sectionData', foreignKey: 'full_code', targetKey: 'full_code' });
 
 // FK from Feed.email to Users.email
 models.Feed.belongsTo(models.Users, { foreignKey: 'email', targetKey: 'email' });
