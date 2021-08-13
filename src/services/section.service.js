@@ -37,20 +37,18 @@ const searchOne = async (options, internal = {}) => {
  * @param {object} internal Used to deliver more options for internal calls (from other functions)
  * @returns {Promise<*|*>}
  */
-const searchSections = async (options, internal = {}) => {
+ const searchSections = async (options, internal = {}) => {
   try {
-    const { code, CRN } = options;
-    let { attributes, justOne } = internal;
+    const { code } = options;
+    let { attributes } = internal;
 
     if (!isArray(attributes) || !attributes.length) attributes = itemAttributes.section;
-    if (typeof justOne !== 'boolean') justOne = false;
 
     // const codeLetters = code.replace(/[0-9]/g, '');
     // const codeDigits = code.replace(/[a-zA-Z]/g, '');
     // const courseCode = `${codeLetters}_${codeDigits}`;
 
     const dbCondition = { course: code };
-    if (typeof CRN === 'number') dbCondition.CRN = CRN;
 
     const dbOptions = {
       attributes,
@@ -58,7 +56,7 @@ const searchSections = async (options, internal = {}) => {
       order: [['year', 'desc']],
     };
 
-    return justOne ? await Sections.findOne(dbOptions) : await Sections.findAll(dbOptions);
+    return await Sections.findAll(dbOptions);
   } catch (e) {
     console.log(e);
     if (e instanceof ApiError) throw e;

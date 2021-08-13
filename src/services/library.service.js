@@ -5,6 +5,7 @@ const { Library, Courses, Sections } = require('../models');
 const { FeedActionType } = require('../types/feed');
 const FeedService = require('./feed.service');
 const itemAttributes = require('./internal/itemAttributes');
+const SectionService = require('./section.service')
 
 async function checkCourseAndSection(course, section) {
   const prelimError = new ApiError(httpStatus.BAD_REQUEST, '');
@@ -39,7 +40,7 @@ async function checkCourseAndSection(course, section) {
  * @param {object} options { email, course?, section? }, email is parsed from JWT
  * @returns {Promise<{payload: {count: *}, error: null, status: string}|{payload: {}, error: null, status: string}>}
  */
-const search = async (options) => {
+ const search = async (options) => {
   try {
     // TODO: Add pagination options since Library list can get long
     const {
