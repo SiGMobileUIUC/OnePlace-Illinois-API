@@ -134,18 +134,11 @@ const drop = async (options) => {
     if (dropCount > 0) {
       /*
           At least one course-section was successfully deleted,
-          so create 'deleted' Feed
+          so create 'trashed' Feed
        */
-      //
-
-      // const feedQuery = {
-      //   email,
-      //   sectionFullCode: `${course}_${section}`,
-      //   type: FeedItemType.Section,
-      //   action: FeedActionType.deleted.sectionSubscriber,
-      // };
-      //
-      // await Feed.destroy({ where: feedQuery });
+      const sectionFullCode = `${course}_${section}`;
+      await FeedService.trash({ email, sectionFullCode });
+      // // Oh also, neat thing about "inTrash" instead of deleting rows is that when user subscribed back (maybe a misclick to delete), we can bring back the past actions
 
       return { count: dropCount };
     }
