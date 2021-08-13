@@ -20,11 +20,11 @@ module.exports = {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
-  full_code: {
+  fullCode: {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  is_active: {
+  isActive: {
     type: DataTypes.BOOLEAN,
     allowNull: false,
     defautValue: true,

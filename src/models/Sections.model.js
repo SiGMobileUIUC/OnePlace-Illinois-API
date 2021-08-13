@@ -19,7 +19,7 @@ module.exports = {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
-  full_code: {
+  fullCode: {
     type: DataTypes.STRING,
     allowNull: false,
     primaryKey: true,
@@ -34,23 +34,23 @@ module.exports = {
     type: DataTypes.STRING,
     allowNull: true,
   },
-  part_of_term: {
+  partOfTerm: {
     type: DataTypes.STRING,
     allowNull: true,
   },
-  section_title: {
+  sectionTitle: {
     type: DataTypes.STRING,
     allowNull: true,
   },
-  section_status: {
+  sectionStatus: {
     type: DataTypes.STRING,
     allowNull: true,
   },
-  section_credit_hours: {
+  sectionCreditHours: {
     type: DataTypes.STRING,
     allowNull: true,
   },
-  enrollment_status: {
+  enrollmentStatus: {
     type: DataTypes.STRING,
     allowNull: true,
   },
@@ -58,19 +58,19 @@ module.exports = {
     type: DataTypes.STRING,
     allowNull: true,
   },
-  type_code: {
+  typeCode: {
     type: DataTypes.STRING,
     allowNull: true,
   },
-  start_time: {
+  startTime: {
     type: DataTypes.STRING,
     allowNull: true,
   },
-  end_time: {
+  endTime: {
     type: DataTypes.STRING,
     allowNull: true,
   },
-  days_of_week: {
+  daysOfWeek: {
     type: DataTypes.STRING,
     allowNull: true,
   },

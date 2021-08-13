@@ -20,7 +20,7 @@ function getFeedDataFromOptions(options) {
 
   const sectionData = SectionService.searchOne({ CRN: section });
   if (sectionData) {
-    sectionTitle = sectionData.section_title;
+    sectionTitle = sectionData.sectionTitle;
   }
 
   if (action === FeedActionType.created.sectionSubscriber) {
@@ -31,13 +31,13 @@ function getFeedDataFromOptions(options) {
 
   return {
     email,
-    section_full_code: fullCode,
-    item_id: itemId,
+    sectionFullCode: fullCode,
+    itemId,
     type,
     body,
     action,
-    attachment_url: attachmentUrl,
-    in_trash: false,
+    attachmentUrl,
+    inTrash: false,
   };
 }
 
@@ -60,13 +60,13 @@ const list = async (options) => {
       if (section) {
         // TODO: Check if escaping here is redundant
         // NOTE: No need for escaping input since Sequelize v4+ auto escapes
-        queryConds.section_full_code = `${course}_${section}`;
+        queryConds.sectionFullCode = `${course}_${section}`;
       } else {
-        queryConds.section_full_code = { [Op.iLike]: `${course}%` }; // 'xyz%' is prefix xyz
+        queryConds.sectionFullCode = { [Op.iLike]: `${course}%` }; // 'xyz%' is prefix xyz
       }
     } else if (section) {
       // use ENDS_WITH sql
-      queryConds.section_full_code = { [Op.iLike]: `%${section}` }; // '%xyz' is suffix xyz
+      queryConds.sectionFullCode = { [Op.iLike]: `%${section}` }; // '%xyz' is suffix xyz
     }
 
     /*
@@ -81,7 +81,7 @@ const list = async (options) => {
     };
 
     if (!onlyFeeds) {
-      // join on Feeds.section_full_code == Sections.full_code
+      // join on Feeds.sectionFullCode == Sections.fullCode
       dbOptions.include = [{
         model: Sections,
         as: 'sectionData',
@@ -123,7 +123,7 @@ const trash = async (options) => {
       };
     }
 
-    await record.update({ in_trash: true });
+    await record.update({ inTrash: true });
 
     return { status: 'success', error: null, payload: {} };
   } catch (e) {

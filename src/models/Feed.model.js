@@ -13,11 +13,11 @@ module.exports = {
       isEmail: true,
     },
   },
-  section_full_code: {
+  sectionFullCode: {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  item_id: {
+  itemId: {
     type: DataTypes.STRING,
     allowNull: false,
   },
@@ -33,14 +33,14 @@ module.exports = {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  attachment_url: {
+  attachmentUrl: {
     type: DataTypes.STRING,
     allowNull: true,
     validate: {
       isUrl: true,
     },
   },
-  // in_trash: {
+  // inTrash: {
   //   type: DataTypes.BOOL,
   //   allowNull: false,
   // },

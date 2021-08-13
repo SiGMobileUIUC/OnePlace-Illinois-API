@@ -1,14 +1,12 @@
 const course = [
   'subject',
   'code',
-  // ['full_code', 'fullCode'],
   'name',
-  // 'full_code',
   'description',
-  ['credit_hours', 'creditHours'],
-  'degree_attributes', // keep this as is for genEd parsing
-  ['schedule_info', 'classScheduleInformation'],
-  ['section_info', 'courseSectionInformation'],
+  'creditHours',
+  'degreeAttributes',
+  ['scheduleInfo', 'classScheduleInformation'],
+  ['sectionInfo', 'courseSectionInformation'],
 ];
 
 const section = [
@@ -17,16 +15,16 @@ const section = [
   'CRN',
   'code',
   'course',
-  ['part_of_term', 'partOfTerm'],
-  ['section_title', 'sectionTitle'],
-  ['section_status', 'sectionStatus'],
-  ['section_credit_hours', 'sectionCreditHours'],
-  ['enrollment_status', 'enrollmentStatus'],
+  'partOfTerm',
+  'sectionTitle',
+  'sectionStatus',
+  'sectionCreditHours',
+  'enrollmentStatus',
   'type',
-  ['type_code', 'typeCode'],
-  ['start_time', 'startTime'],
-  ['end_time', 'endTime'],
-  ['days_of_week', 'daysOfWeek'],
+  'typeCode',
+  'startTime',
+  'endTime',
+  'daysOfWeek',
   'room',
   'building',
   'instructors',
@@ -34,20 +32,21 @@ const section = [
 
 const feed = [
   'email',
-  ['section_full_code', 'sectionFullCode'], // `section_full_code` AS `sectionFullCode`
-  ['item_id', 'itemId'], // `item_id` as `itemId`
+  'sectionFullCode',
+  'itemId',
   'type',
   'body',
   'action',
-  ['attachment_url', 'attachmentUrl'], // `attachment_url` AS `attachmentUrl`
-  ['createdAt', 'postDate'], // `createdAt` AS `postDate`
+  'attachmentUrl',
+  'postDate',
 ];
 
 const library = [
   'course',
   'section',
   'createdAt',
-  ['is_active', 'isActive'],
+  'isActive',
+  // 'inTrash',
 ];
 
 module.exports = {

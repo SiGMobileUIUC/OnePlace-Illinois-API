@@ -12,14 +12,14 @@ async function checkCourseAndSection(course, section) {
   prelimError.name = 'invalid_course_or_section';
 
   // Check that course exists
-  const courseExists = await Courses.findOne({ where: { full_code: course } }); // e.g. CS124
+  const courseExists = await Courses.findOne({ where: { fullCode: course } }); // e.g. CS124
   if (!courseExists) {
     prelimError.message = 'Course requested not found';
     throw prelimError;
   }
 
   // Check that section exists
-  const sectionExists = await Sections.findOne({ where: { full_code: `${course}_${section}` } }); // e.g. CS124_74477
+  const sectionExists = await Sections.findOne({ where: { fullCode: `${course}_${section}` } }); // e.g. CS124_74477
   if (!sectionExists) {
     prelimError.message = 'Section requested not found';
     throw prelimError;
@@ -66,7 +66,7 @@ async function checkCourseAndSection(course, section) {
 
     // if: onlyActive is true, then: find records with is_active === true
     // else: get all active & inactive sections
-    if (onlyActive) dbOptions.where.is_active = onlyActive;
+    if (onlyActive) dbOptions.where.isActive = onlyActive;
 
     return await Library.findAll(dbOptions);
   } catch (e) {
@@ -89,7 +89,7 @@ const add = async (options) => {
 
     const fullCode = `${course}_${section}`;
     const condition = {
-      email, course, section, full_code: fullCode, is_active: true,
+      email, course, section, fullCode, isActive: true,
     };
 
     const record = await Library.findOne({ where: condition });
@@ -140,7 +140,7 @@ const drop = async (options) => {
 
       // const feedQuery = {
       //   email,
-      //   section_full_code: `${course}_${section}`,
+      //   sectionFullCode: `${course}_${section}`,
       //   type: FeedItemType.Section,
       //   action: FeedActionType.deleted.sectionSubscriber,
       // };
@@ -171,14 +171,14 @@ const activationSwitch = async (options, shouldActivate) => {
 
     await checkCourseAndSection(course, section);
 
-    const condition = {
-      email, course, section, full_code: `${course}_${section}`,
+    const conditions = {
+      email, course, section, fullCode: `${course}_${section}`,
     };
 
-    const record = await Library.findOne({ where: condition });
+    const record = await Library.findOne({ where: conditions });
     if (!record) throw new ApiError(httpStatus.BAD_REQUEST, 'No course-section available for user');
 
-    await record.update({ is_active: shouldActivate });
+    await record.update({ isActive: shouldActivate });
 
     return { status: 'success', error: null, payload: {} };
   } catch (e) {

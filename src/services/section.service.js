@@ -12,10 +12,6 @@ const searchOne = async (options, internal = {}) => {
 
     if (!isArray(attributes) || !attributes.length) attributes = itemAttributes.section;
 
-    // const codeLetters = code.replace(/[0-9]/g, '');
-    // const codeDigits = code.replace(/[a-zA-Z]/g, '');
-    // const courseCode = `${codeLetters}${codeDigits}`;
-
     const dbCondition = { CRN };
 
     const dbOptions = {

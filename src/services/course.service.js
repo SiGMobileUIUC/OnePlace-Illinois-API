@@ -57,7 +57,7 @@ const searchCourses = async (options) => {
     // ** Writing "TableName"."ColumnName" in search query is critical when JOINing tables that have same column names
     const resultOrder = [
       // first prioritize the subject_code
-      inKeyword.subjectCode && inKeyword.courseCode ? [literal(`CASE WHEN "Courses"."full_code" = '${inKeyword.subjectCode}${inKeyword.courseCode}' THEN 1 ELSE 4 END`), 'asc'] : [],
+      inKeyword.subjectCode && inKeyword.courseCode ? [literal(`CASE WHEN "Courses"."fullCode" = '${inKeyword.subjectCode}${inKeyword.courseCode}' THEN 1 ELSE 4 END`), 'asc'] : [],
       // then the course code
       inKeyword.courseCode ? [literal(`CASE WHEN "Courses"."code" = ${inKeyword.courseCode} THEN 2 ELSE 4 END`), 'asc'] : [],
       // then the subject code
@@ -99,7 +99,7 @@ const searchCourses = async (options) => {
       // Gen Eds (ie. degree attributes)
       // - courses with multiple Gen Eds (e.g. ANTH 103 or GEOG 101) are separated with ", and" in the csv
       //   so remove "and", split by "," and remove "course."
-      const genEds = course.degree_attributes
+      const genEds = course.degreeAttributes
         .replace(/\sand\s/, ' ').split(',')
         .map((genEd) => genEd.replace(/\scourse.$/, '')).filter((x) => x);
 
@@ -110,7 +110,6 @@ const searchCourses = async (options) => {
       course.subject = subjectCodeToName[course.subjectId] || '';
       course.courseId = course.code;
       course.genEd = genEds;
-      course.fullCode = course.full_code; // same as `${subject}${course}`
 
       // if: only_courses == false, then: copy section to a renamed key (for storing)
       // else: will discard the section data
@@ -118,8 +117,7 @@ const searchCourses = async (options) => {
 
       delete course.Sections;
       delete course.code;
-      delete course.full_code;
-      delete course.degree_attributes;
+      delete course.degreeAttributes;
 
       return course;
     });
