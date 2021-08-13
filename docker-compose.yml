@@ -3,6 +3,7 @@ version: '3'
 services:
   app:
     build: .
+    user: root
     image: opillinois-api-app
     depends_on:
       - postgres
