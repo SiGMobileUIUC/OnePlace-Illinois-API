@@ -4,28 +4,31 @@ const { Op } = require('sequelize');
 const { Feed, Sections } = require('../models');
 const { FeedItemType, FeedActionType } = require('../types/feed');
 const ApiError = require('../utils/ApiError');
+const { spaceOutCourseCode } = require('../utils/helpers');
 
 const itemAttributes = require('./internal/itemAttributes');
 const SectionService = require('./section.service');
 
-function getFeedDataFromOptions(options) {
+async function getFeedDataFromOptions(options) {
   const {
     email, course, section, action, attachmentUrl,
   } = options;
   const fullCode = `${course}_${section}`;
+  const courseCodeExpanded = spaceOutCourseCode(course);
   let type;
   let body;
   let itemId;
-  let sectionTitle = section;
+  let sectionCode = section;
 
-  const sectionData = SectionService.searchOne({ CRN: section });
+  // Get relevant section data
+  const sectionData = await SectionService.searchOne({ CRN: section }, { attributes: ['code'] });
   if (sectionData) {
-    sectionTitle = sectionData.sectionTitle;
+    sectionCode = sectionData.code; // e.g. ABA, EL5, etc.
   }
 
   if (action === FeedActionType.created.sectionSubscriber) {
     type = FeedItemType.Section;
-    body = `You subscribed to the section ${sectionTitle} of ${fullCode}`;
+    body = `You subscribed to the section ${sectionCode} of ${courseCodeExpanded}`;
     itemId = fullCode;
   }
 
@@ -100,7 +103,7 @@ const list = async (options) => {
 
 const create = async (options) => {
   try {
-    const feedData = getFeedDataFromOptions(options);
+    const feedData = await getFeedDataFromOptions(options);
     return await Feed.create(feedData);
   } catch (e) {
     console.log(e);

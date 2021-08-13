@@ -38,7 +38,7 @@ const feed = [
   'body',
   'action',
   'attachmentUrl',
-  'postDate',
+  ['createdAt', 'postDate'], // get `createdAt` column as `postDate`
 ];
 
 const library = [
