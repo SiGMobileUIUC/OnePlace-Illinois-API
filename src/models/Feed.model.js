@@ -41,7 +41,7 @@ module.exports = {
     },
   },
   inTrash: {
-    type: DataTypes.BOOL,
+    type: DataTypes.BOOLEAN,
     allowNull: false,
     defaultValue: false,
   },
