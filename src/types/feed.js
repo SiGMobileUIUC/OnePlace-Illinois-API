@@ -6,10 +6,10 @@ const FeedItemType = {
 
 const FeedActionType = {
   created: {
-    sectionSubscriber: 'created__section_subscriber',
+    sectionSubscriber: 'User followed this section.',
   },
   deleted: {
-    sectionSubscriber: 'deleted__section_subscriber',
+    sectionSubscriber: 'User unfollowed this section.',
   },
 };
 

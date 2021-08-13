@@ -5,7 +5,6 @@ const { Library, Courses, Sections } = require('../models');
 const { FeedActionType } = require('../types/feed');
 const FeedService = require('./feed.service');
 const itemAttributes = require('./internal/itemAttributes');
-const SectionService = require('./section.service')
 
 async function checkCourseAndSection(course, section) {
   const prelimError = new ApiError(httpStatus.BAD_REQUEST, '');
