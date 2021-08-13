@@ -4,6 +4,8 @@ const ApiError = require('../utils/ApiError');
 const { Library, Courses, Sections } = require('../models');
 const { FeedActionType } = require('../types/feed');
 const FeedService = require('./feed.service');
+const itemAttributes = require('./internal/itemAttributes');
+const SectionService = require('./section.service')
 
 async function checkCourseAndSection(course, section) {
   const prelimError = new ApiError(httpStatus.BAD_REQUEST, '');
@@ -38,13 +40,21 @@ async function checkCourseAndSection(course, section) {
  * @param {object} options { email, course?, section? }, email is parsed from JWT
  * @returns {Promise<{payload: {count: *}, error: null, status: string}|{payload: {}, error: null, status: string}>}
  */
-const search = async (options) => {
+ const search = async (options) => {
   try {
     const {
       email, course, section, only_active: onlyActive,
     } = options;
 
-    const dbOptions = { attributes: ['course', 'section', 'createdAt'], where: { email } };
+    const dbOptions = {
+      attributes: ['course', 'section', 'createdAt'],
+      where: { email },
+      include: [{
+        model: Sections,
+        required: true,
+        attributes: itemAttributes.section,
+      }],
+    };
 
     if (course) dbOptions.where.course = course;
     if (section) dbOptions.where.section = section;
