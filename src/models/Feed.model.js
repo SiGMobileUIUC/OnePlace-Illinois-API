@@ -40,8 +40,9 @@ module.exports = {
       isUrl: true,
     },
   },
-  // inTrash: {
-  //   type: DataTypes.BOOL,
-  //   allowNull: false,
-  // },
+  inTrash: {
+    type: DataTypes.BOOL,
+    allowNull: false,
+    defaultValue: false,
+  },
 };

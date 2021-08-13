@@ -114,19 +114,11 @@ const create = async (options) => {
 
 const trash = async (options) => {
   try {
-    const { id } = options;
+    const { email, sectionFullCode } = options;
 
-    const record = await Feed.findOne({ where: { id } });
-    if (!record) {
-      return {
-        status: 'success',
-        error: null,
-        msg: 'Specified feed record not found for the user',
-        payload: {},
-      };
-    }
+    if (!email || !sectionFullCode) throw new ApiError(httpStatus.BAD_REQUEST, 'Missing trash parameters');
 
-    await record.update({ inTrash: true });
+    await Feed.update({ inTrash: true }, { where: { email, sectionFullCode } });
 
     return { status: 'success', error: null, payload: {} };
   } catch (e) {

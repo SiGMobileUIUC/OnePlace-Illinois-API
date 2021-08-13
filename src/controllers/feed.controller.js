@@ -13,15 +13,6 @@ const list = catchAsync(async (req, res, next) => {
   next();
 });
 
-const trash = catchAsync(async (req, res, next) => {
-  const options = pick(req.body, ['id']);
-  const resJson = await feedService.list(options);
-
-  if (resJson.msg) res.locals = { msg: resJson.msg };
-
-  next();
-});
-
 module.exports = {
-  list, trash,
+  list,
 };
