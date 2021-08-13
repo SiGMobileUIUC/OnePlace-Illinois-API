@@ -15,6 +15,12 @@ function deepExtend(...extend) {
   return end;
 }
 
+const spaceOutCourseCode = (courseCode) => {
+  const subject = courseCode.replace(/[1-9]/g, '');
+  const course = courseCode.replace(subject, '');
+  return `${subject} ${course}`;
+}
+
 module.exports = {
-  isArray, isObject, isDictionary, deepExtend,
+  isArray, isObject, isDictionary, deepExtend, spaceOutCourseCode,
 };
