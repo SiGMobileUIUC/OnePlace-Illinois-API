@@ -2,23 +2,17 @@ const httpStatus = require('http-status');
 
 const ApiError = require('../utils/ApiError');
 const { Sections } = require('../models');
-const { isArray } = require('../utils');
-
-const sectionAttributes = ['year', 'term', 'CRN', 'full_code', 'course', 'code', 'part_of_term', 'section_title', 'section_status', 'section_credit_hours', 'enrollment_status', 'type', 'type_code', 'start_time', 'end_time', 'days_of_week', 'room', 'building', 'instructors'];
+const { isArray } = require('../utils/helpers');
+const itemAttributes = require('./internal/itemAttributes');
 
 const searchOne = async (options, internal = {}) => {
   try {
-    const { code, CRN } = options;
+    const { CRN } = options;
     let { attributes } = internal;
 
-    if (!isArray(attributes) || !attributes.length) attributes = sectionAttributes;
+    if (!isArray(attributes) || !attributes.length) attributes = itemAttributes.section;
 
-    const codeLetters = code.replace(/[0-9]/g, '');
-    const codeDigits = code.replace(/[a-zA-Z]/g, '');
-    const courseCode = `${codeLetters}_${codeDigits}`;
-
-    const dbCondition = { course: courseCode };
-    if (typeof CRN === 'number') dbCondition.CRN = CRN;
+    const dbCondition = { CRN };
 
     const dbOptions = {
       attributes,
@@ -41,20 +35,18 @@ const searchOne = async (options, internal = {}) => {
  */
 const searchSections = async (options, internal = {}) => {
   try {
-    const { code, CRN } = options;
-    let { attributes, justOne } = internal;
+    const { course, section } = options;
+    let { attributes } = internal;
 
-    if (!isArray(attributes) || !attributes.length) attributes = sectionAttributes;
-    if (typeof justOne !== 'boolean') justOne = false;
+    if (!isArray(attributes) || !attributes.length) attributes = itemAttributes.section;
 
-    const codeLetters = code.replace(/[0-9]/g, '');
-    const codeDigits = code.replace(/[a-zA-Z]/g, '');
-    const courseCode = `${codeLetters}_${codeDigits}`;
+    const dbCondition = {};
 
-    console.log(courseCode);
-
-    const dbCondition = { course: courseCode };
-    if (typeof CRN === 'number') dbCondition.CRN = CRN;
+    // Allow User to supply one or both (none will be invalidated by Joi beforehand)
+    // Course = ALL sections of that course
+    // Section OR (Course + Section) = ONE section
+    if (course) dbCondition.course = course;
+    if (section) dbCondition.CRN = section;
 
     const dbOptions = {
       attributes,
@@ -62,9 +54,10 @@ const searchSections = async (options, internal = {}) => {
       order: [['year', 'desc']],
     };
 
-    return justOne ? Sections.findOne(dbOptions) : Sections.findAll(dbOptions);
+    return await Sections.findAll(dbOptions);
   } catch (e) {
     console.log(e);
+    if (e instanceof ApiError) throw e;
     throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Internal server error');
   }
 };

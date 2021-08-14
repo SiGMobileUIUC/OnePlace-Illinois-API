@@ -11,17 +11,26 @@ services:
       - postgres
     volumes:
       - .:/usr/src/oneplace-illinois-api
+      - /usr/src/oneplace-illinois-api/node_modules
     ports:
-      - '80:80'
+      #- '80:80'
+      - '3000:3000' # for alternative local dev
     networks:
       - default
     env_file:
       - .env.docker # postgres env data & app's PORT
     environment:
+      # https://docs.docker.com/docker-for-mac/networking/#use-cases-and-workarounds
+      # POSTGRES_HOST -- host.docker.internal (Docker figures out host for us) and avoid using 127.0.0.1 (localhost)
+      # POSTGRES_HOST: host.docker.internal
+      #POSTGRES_HOST: 172.17.0.1 # host.docker.internal doesn't work on older Docker or just doesn't work.
       POSTGRES_HOST: postgres
+    # Run multiple commands
+    # *** use 'sh' since alpine doesn't support 'bash' ***
+    # 'npm i papaparse' because node throws error 'papaparse uninstalled' (even after npm ci). Idk why...
     command: sh -c "
-        NODE_ENV=test node src/workers/parse-course-csv.js
-        && npm ci
+        npm i papaparse
+        && npm run parse-cis
         && npm start
       "
 
@@ -31,7 +40,10 @@ services:
     volumes:
       - db-data:/var/lib/postgresql/data # persistent data
     ports:
-      - "5435:5432" # unusual port 5435!
+      # change to "5435:5432" if the server's port 5435 is already being used (by another docker or local Postgres)
+      # then, make sure Sequelize connects to Postgres on port: 5435 (inside docker, Postgres runs on 5432)
+      # ** change at config/config.js -> postgres.sequelize_port: 5432 **
+      - "5432:5432"
     networks:
       - default
     env_file:

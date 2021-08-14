@@ -1,11 +1,9 @@
-const axios = require('axios');
-const cheerio = require('cheerio');
 const httpStatus = require('http-status');
 const { Op, literal } = require('sequelize');
 
 const ApiError = require('../utils/ApiError');
-const { Courses } = require('../models');
-const { searchSections } = require('./section.service');
+const { Courses, Sections } = require('../models');
+const itemAttributes = require('./internal/itemAttributes');
 const subjectCodeToName = require('../../data/2021-subjects.json');
 
 const isUpperCase = (str) => str === str.toUpperCase();
@@ -55,19 +53,20 @@ const searchCourses = async (options) => {
       }
     });
 
-    // order by more matches first (remove the empty []'s when conditions don't match)
+    // Order by more matches first (remove the empty []'s when conditions don't match)
+    // ** Writing "TableName"."ColumnName" in search query is critical when JOINing tables that have same column names
     const resultOrder = [
       // first prioritize the subject_code
-      inKeyword.subjectCode && inKeyword.courseCode ? [literal(`CASE WHEN full_code = '${inKeyword.subjectCode}_${inKeyword.courseCode}' THEN 1 ELSE 4 END`), 'asc'] : [],
+      inKeyword.subjectCode && inKeyword.courseCode ? [literal(`CASE WHEN "Courses"."fullCode" = '${inKeyword.subjectCode}${inKeyword.courseCode}' THEN 1 ELSE 4 END`), 'asc'] : [],
       // then the course code
-      inKeyword.courseCode ? [literal(`CASE WHEN code = ${inKeyword.courseCode} THEN 2 ELSE 4 END`), 'asc'] : [],
+      inKeyword.courseCode ? [literal(`CASE WHEN "Courses"."code" = ${inKeyword.courseCode} THEN 2 ELSE 4 END`), 'asc'] : [],
       // then the subject code
-      inKeyword.subjectCode ? [literal(`CASE WHEN subject = '${inKeyword.subjectCode}' THEN 3 ELSE 4 END`), 'asc'] : [],
+      inKeyword.subjectCode ? [literal(`CASE WHEN "Courses"."subject" = '${inKeyword.subjectCode}' THEN 3 ELSE 4 END`), 'asc'] : [],
       ['name', 'asc'],
     ].filter((x) => x.length > 0);
 
     const dbOptions = {
-      attributes: ['subject', 'code', 'name', 'description', 'credit_hours', 'degree_attributes', 'schedule_info', 'section_info'],
+      attributes: itemAttributes.course,
       where: { [Op.or]: orQueries },
       order: resultOrder,
       limit: Math.max(10, perPage),
@@ -75,112 +74,56 @@ const searchCourses = async (options) => {
     };
 
     /*
-        Search and refine matched courses
+        JOIN on `Sections` to include section data
+        ** LIMIT 1 when qs only_courses === true (one section is needed for 'year' and 'term')
+        ** GET All when qs only_courses === false
      */
+    dbOptions.include = [{
+      model: Sections,
+      required: true,
+      attributes: itemAttributes.section,
+    }];
+    if (onlyCourses) dbOptions.include[0].limit = 1;
 
-    // const foundCount = await Courses.count({ where: { [Op.or]: orQueries }});
+    // Get course data
+    const courses = (await Courses.findAll(dbOptions)).map((x) => x.get({ plain: true })); // gets pure array
 
-    let courses = await Courses.findAll(dbOptions);
+    // Refine course data & return
+    return courses.map((_course) => {
+      const course = _course;
+      const sections = course.Sections;
 
-    // Get additional Course and Sections data
-    const tmpSections = {};
+      // Year & Term - retrieved from the first section data
+      const { year, term } = sections[0];
 
-    for (const course of courses) {
-      const courseFullCode = `${course.subject}${course.code}`;
-      const internalOptions = {
-        attributes: ['year', 'term', 'CRN', 'code', 'part_of_term', 'section_title', 'section_status', 'section_credit_hours', 'enrollment_status', 'type', 'type_code', 'start_time', 'end_time', 'days_of_week', 'room', 'building', 'instructors'],
-      };
-      tmpSections[courseFullCode] = await searchSections({ code: courseFullCode }, internalOptions);
-    }
+      // Gen Eds (ie. degree attributes)
+      // - courses with multiple Gen Eds (e.g. ANTH 103 or GEOG 101) are separated with ", and" in the csv
+      //   so remove "and", split by "," and remove "course."
+      const genEds = course.degreeAttributes
+        .replace(/\sand\s/, ' ').split(',')
+        .map((genEd) => genEd.replace(/\scourse.$/, '')).filter((x) => x);
 
-    courses = courses.map((course) => {
-      const courseFullCode = `${course.subject}${course.code}`;
-      const sections = tmpSections[courseFullCode];
+      // Modify course data
+      course.year = year;
+      course.semester = term;
+      course.subjectId = course.subject; // this comes before course.subject
+      course.subject = subjectCodeToName[course.subjectId] || '';
+      course.courseId = course.code;
+      course.genEd = genEds;
 
-      // const sectionLinks = sections.map((section) => `/api/v1/section/search?code=${courseFullCode}&CRN=${section.CRN}`);
-      const sectionLinks = sections.map((section) => `${section.code}_${section.CRN}`);
-      const { year, term } = sections[0].dataValues; // get from the first section
-      let termID = 'fa';
-      if (term === 'spring') termID = 'sp';
-      else if (term === 'summer') termID = 'su';
+      // if: only_courses == false, then: copy section to a renamed key (for storing)
+      // else: will discard the section data
+      if (!onlyCourses) course.sections = sections;
 
-      return {
-        year,
-        semester: term,
-        semesterID: termID,
-        subject: subjectCodeToName[course.subject] || '',
-        subjectId: course.subject,
-        courseId: course.code,
-        name: course.name,
-        description: course.description,
-        creditHours: course.credit_hours,
-        courseSectionInformation: course.section_info,
-        genEd: course.degree_attributes,
-        sections: sectionLinks,
-      };
-    });
+      delete course.Sections;
+      delete course.code;
+      delete course.degreeAttributes;
 
-    // return only course data
-    if (onlyCourses) return courses;
-
-    courses = courses.map((course) => {
-      const courseFullCode = `${course.subjectId}${course.courseId}`;
-      course.sections = tmpSections[courseFullCode];
       return course;
     });
-
-    return courses;
   } catch (e) {
     console.log(e);
-    throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Internal server error');
-  }
-};
-
-/**
- * Fetch courses from Illinois website using our own options
- * @param {object} options
- * @returns {Promise>}
- */
-const searchCoursesThroughWebsites = async (options) => {
-  try {
-    const keyword = options.keyword.toLowerCase();
-    const { term, year } = options;
-
-    const url = `https://courses.illinois.edu/search?keyword=${keyword}&term=${term}&year=${year}&length=10`;
-    const relayedRes = await axios.get(url);
-    const $ = cheerio.load(relayedRes.data);
-
-    const $resultRows = $('#search-result-dt > tbody > tr');
-    const years = [];
-    const terms = [];
-    const subjects = [];
-    const numbers = [];
-    const names = [];
-
-    $resultRows.each((i, row) => {
-      const cols = $(row).children('td');
-      const courseFullCode = $(cols[3]).html().split(' '); // e.g. 'STAT 200' => ['STAT', '200']
-      // for courseName, remove tab \t, newline \n, and \r, and then trim whitespace
-      const courseName = $(cols[4]).find('a').text().replace(/[\t\n\r]/gm,'').trim();
-      years.push($(cols[1]).html());
-      terms.push($(cols[2]).html());
-      names.push(courseName);
-      subjects.push(courseFullCode[0]);
-      numbers.push(courseFullCode[1]);
-    });
-
-    const courses = years.map((year, i) => {
-      return {
-        year,
-        term: terms[i],
-        subjectId: subjects[i],
-        subjectNumber: numbers[i],
-        name: names[i],
-      };
-    });
-
-    return courses;
-  } catch (e) {
+    if (e instanceof ApiError) throw e;
     throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Internal server error');
   }
 };

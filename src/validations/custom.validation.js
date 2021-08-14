@@ -15,7 +15,10 @@ const password = (value, helpers) => {
   return value;
 };
 
+const jwtRegex = RegExp(/^[a-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_.+/=]*$/, 'i');
+
 module.exports = {
   objectId,
   password,
+  jwtRegex,
 };

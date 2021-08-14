@@ -8,15 +8,15 @@ module.exports = {
     unique: true,
   },
   subject: {
-    type: DataTypes.STRING(10),
+    type: DataTypes.STRING,
     allowNull: false,
   },
   code: {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
-  full_code: {
-    type: DataTypes.STRING(20),
+  fullCode: {
+    type: DataTypes.STRING,
     allowNull: false,
     primaryKey: true,
     unique: true,
@@ -30,19 +30,19 @@ module.exports = {
     type: DataTypes.TEXT, // Postgres doesn't support text with option (e.g. tinytext)
     allowNull: true,
   },
-  credit_hours: {
+  creditHours: {
     type: DataTypes.STRING,
     allowNull: true,
   },
-  degree_attributes: {
+  degreeAttributes: {
     type: DataTypes.TEXT,
     allowNull: true,
   },
-  schedule_info: {
+  scheduleInfo: {
     type: DataTypes.TEXT,
     allowNull: true,
   },
-  section_info: {
+  sectionInfo: {
     type: DataTypes.TEXT,
     allowNull: true,
   },

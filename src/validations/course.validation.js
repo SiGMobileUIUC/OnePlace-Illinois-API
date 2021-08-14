@@ -7,7 +7,7 @@ const search = {
     // page starts at 1
     page: Joi.number().integer().min(1).optional().default(1),
     per_page: Joi.number().integer().min(10).max(30).optional().default(15),
-    only_courses: Joi.boolean().optional().default(false),
+    only_courses: Joi.boolean().optional().default(true),
     // term: Joi.string().allow('fall', 'spring', 'summer').default('fall'),
     // year: Joi.number().integer().min(2000).max(new Date().getFullYear()).empty(['', null]).default(new Date().getFullYear()),
   },

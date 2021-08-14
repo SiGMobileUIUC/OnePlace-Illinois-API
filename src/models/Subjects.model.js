@@ -8,7 +8,7 @@ module.exports = {
     unique: true,
   },
   code: {
-    type: DataTypes.STRING(10),
+    type: DataTypes.STRING,
     allowNull: false,
     primaryKey: true,
     unique: true,
